@@ -1,8 +1,14 @@
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store';
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <header className="bg-[#090909] border-b border-orange-500/20 sticky top-0 z-50 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
@@ -28,7 +34,7 @@ const Navbar = () => {
                 <Link to="/admin/dashboard" className="text-sm text-dark hover:text-primary">Admin</Link>
               )}
               <button
-                onClick={logout}
+                onClick={handleLogout}
                 className="btn-outline text-sm"
               >
                 Logout
