@@ -213,5 +213,6 @@ module.exports = {
     createTestimonial,
     approveTestimonial,
     rejectTestimonial,
+    getUserTestimonials,
     getAverageRating
 };
