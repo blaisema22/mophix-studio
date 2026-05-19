@@ -23,15 +23,14 @@ const Navbar = () => {
           <NavLink to="/contact" className={({ isActive }) => `${isActive ? 'text-orange-400' : 'text-gray-300'} hover:text-orange-300`}>Contact</NavLink>
         </nav>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-4">
           {isAuthenticated ? (
             <>
-              <Link to="/profile" className="text-sm text-dark hover:text-primary">My Profile</Link>
               {user?.role === 'client' && (
-                <Link to="/my-bookings" className="text-sm text-dark hover:text-primary">My Bookings</Link>
+                <Link to="/dashboard" className="text-sm text-gray-300 hover:text-orange-400">Dashboard</Link>
               )}
               {user?.role === 'admin' && (
-                <Link to="/admin/dashboard" className="text-sm text-dark hover:text-primary">Admin</Link>
+                <Link to="/admin/dashboard" className="text-sm text-gray-300 hover:text-orange-400">Admin</Link>
               )}
               <button
                 onClick={handleLogout}
