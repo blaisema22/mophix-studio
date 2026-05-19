@@ -20,11 +20,15 @@ export const useAuthStore = create(
                 isAuthenticated: true
             }),
 
-            logout: () => set({
-                user: null,
-                token: null,
-                isAuthenticated: false
-            }),
+            logout: () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                return set({
+                    user: null,
+                    token: null,
+                    isAuthenticated: false
+                });
+            },
 
             updateUser: (user) => set({ user })
         }),
