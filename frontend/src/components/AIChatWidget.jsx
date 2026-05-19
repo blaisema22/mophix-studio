@@ -155,7 +155,9 @@ export default function AIChatWidget() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 ) : (
-                    <AIIcon />
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
                 )}
                 {/* Pulse ring */}
                 {!open && (
@@ -167,14 +169,23 @@ export default function AIChatWidget() {
 }
 
 function AIIcon({ small = false }) {
-    const size = small ? 14 : 24;
+    const size = small ? 14 : 22;
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={small ? 'text-orange-400' : 'text-black'}>
-            <path d="M12 2a2 2 0 0 1 2 2v1h2a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3h2V4a2 2 0 0 1 2-2z" />
-            <circle cx="9" cy="11" r="1" fill="currentColor" />
-            <circle cx="15" cy="11" r="1" fill="currentColor" />
-            <path d="M9 15s1 1 3 1 3-1 3-1" />
-            <line x1="12" y1="2" x2="12" y2="4" />
+        <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width={size} 
+            height={size} 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth={2} 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            className={small ? 'text-orange-400' : 'text-black'}
+        >
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+            <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5z"/>
+            <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z"/>
         </svg>
     );
 }
