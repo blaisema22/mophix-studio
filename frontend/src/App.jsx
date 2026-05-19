@@ -1,13 +1,12 @@
 // Main App Component
 
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from './store';
 import { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
 
 // Layouts
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import AIChatWidget from './components/AIChatWidget';
 
 // Public Pages
@@ -25,6 +24,20 @@ import Register from './pages/Register';
 import BookingRequest from './pages/BookingRequest';
 import MyBookings from './pages/MyBookings';
 import MyProfile from './pages/MyProfile';
+import DashboardLayout from './pages/dashboard/DashboardLayout';
+import DashboardHome from './pages/dashboard/DashboardHome';
+import DashboardBookings from './pages/dashboard/DashboardBookings';
+import DashboardNewBooking from './pages/dashboard/DashboardNewBooking';
+import DashboardUpcomingBookings from './pages/dashboard/DashboardUpcomingBookings';
+import DashboardBookingHistory from './pages/dashboard/DashboardBookingHistory';
+import DashboardGalleries from './pages/dashboard/DashboardGalleries';
+import DashboardViewPhotos from './pages/dashboard/DashboardViewPhotos';
+import DashboardDownloadPhotos from './pages/dashboard/DashboardDownloadPhotos';
+import DashboardTestimonials from './pages/dashboard/DashboardTestimonials';
+import DashboardWriteReview from './pages/dashboard/DashboardWriteReview';
+import DashboardSubmittedReviews from './pages/dashboard/DashboardSubmittedReviews';
+import DashboardProfile from './pages/dashboard/DashboardProfile';
+import DashboardChangePassword from './pages/dashboard/DashboardChangePassword';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -50,8 +63,10 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return children;
 };
 
-function App() {
+function AppContent() {
+    const location = useLocation();
     const { isAuthenticated, user } = useAuthStore();
+    const hideNavbar = location.pathname.startsWith('/dashboard');
 
     useEffect(() => {
         // Initialize auth from localStorage
@@ -68,12 +83,11 @@ function App() {
     }, []);
 
     return (
-        <Router>
-            <div className="flex flex-col min-h-screen bg-black text-white">
-                <Navbar />
-                
-                <main className="flex-1">
-                    <Routes>
+        <div className="flex flex-col min-h-screen bg-black text-white">
+            {!hideNavbar && <Navbar />}
+            
+            <main className="flex-1">
+                <Routes>
                         {/* Public Routes */}
                         <Route path="/" element={<Home />} />
                         <Route path="/portfolio" element={<Portfolio />} />
@@ -94,6 +108,29 @@ function App() {
                                 </ProtectedRoute>
                             }
                         />
+                        <Route
+                            path="/dashboard/*"
+                            element={
+                                <ProtectedRoute requiredRole="client">
+                                    <DashboardLayout />
+                                </ProtectedRoute>
+                            }
+                        >
+                            <Route index element={<DashboardHome />} />
+                            <Route path="bookings" element={<DashboardBookings />} />
+                            <Route path="bookings/new" element={<DashboardNewBooking />} />
+                            <Route path="bookings/upcoming" element={<DashboardUpcomingBookings />} />
+                            <Route path="bookings/history" element={<DashboardBookingHistory />} />
+                            <Route path="galleries" element={<DashboardGalleries />} />
+                            <Route path="galleries/view" element={<DashboardViewPhotos />} />
+                            <Route path="galleries/download" element={<DashboardDownloadPhotos />} />
+                            <Route path="testimonials" element={<DashboardTestimonials />} />
+                            <Route path="testimonials/write" element={<DashboardWriteReview />} />
+                            <Route path="testimonials/submitted" element={<DashboardSubmittedReviews />} />
+                            <Route path="account" element={<Navigate to="account/profile" replace />} />
+                            <Route path="account/profile" element={<DashboardProfile />} />
+                            <Route path="account/change-password" element={<DashboardChangePassword />} />
+                        </Route>
                         <Route
                             path="/my-bookings"
                             element={
@@ -172,12 +209,18 @@ function App() {
                         {/* 404 */}
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
-                </main>
+            </main>
 
-                <Footer />
-                <Toaster />
-                <AIChatWidget />
-            </div>
+            <Toaster />
+            <AIChatWidget />
+        </div>
+    );
+}
+
+function App() {
+    return (
+        <Router>
+            <AppContent />
         </Router>
     );
 }

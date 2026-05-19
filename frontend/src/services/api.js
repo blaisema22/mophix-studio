@@ -64,6 +64,7 @@ export const servicesService = {
 export const galleriesService = {
     getAll: (params) => api.get('/galleries', { params }),
     getById: (id) => api.get(`/galleries/${id}`),
+    getPhotos: (galleryId, params) => api.get(`/galleries/${galleryId}/photos`, { params }),
     create: (data) => api.post('/galleries', data),
     update: (id, data) => api.put(`/galleries/${id}`, data),
     delete: (id) => api.delete(`/galleries/${id}`),
@@ -95,13 +96,13 @@ export const bookingsService = {
 
 export const testimonialsService = {
     getAll: (params) => api.get('/testimonials', { params }),
+    getUserTestimonials: (params) => api.get('/testimonials/user', { params }),
     getAverageRating: () => api.get('/testimonials/rating/average'),
     create: (data) => api.post('/testimonials', data),
     getPending: (params) => api.get('/testimonials/pending', { params }),
     approve: (id, data) => api.post(`/testimonials/${id}/approve`, data),
     reject: (id) => api.post(`/testimonials/${id}/reject`),
 };
-
 // ============ CONTACT SERVICES ============
 
 export const contactService = {

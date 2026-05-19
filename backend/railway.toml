@@ -1,0 +1,8 @@
+# Railway deployment configuration for Node.js backend
+# Railway will automatically detect this file
+
+[build]
+builder = "nixpacks"
+
+[env]
+NODE_ENV = "production"

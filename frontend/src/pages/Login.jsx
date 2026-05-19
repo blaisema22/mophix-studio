@@ -23,7 +23,8 @@ const Login = () => {
       loginStore(payload.user, payload.token);
       localStorage.setItem('token', payload.token);
       localStorage.setItem('user', JSON.stringify(payload.user));
-      navigate('/');
+      const destination = payload.user?.role === 'admin' ? '/admin/dashboard' : '/dashboard';
+      navigate(destination);
     } catch (err) {
       console.error(err);
       setError(err.message || 'Unable to sign in. Please check your credentials.');

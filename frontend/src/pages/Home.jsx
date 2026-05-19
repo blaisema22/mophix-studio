@@ -28,6 +28,11 @@ const Home = () => {
     loadContent();
   }, []);
 
+  const formatPrice = (price) => {
+    const value = Number(price);
+    return Number.isFinite(value) ? `RWF ${value.toFixed(0)}` : 'Contact';
+  };
+
   return (
     <section className="container mx-auto px-4 py-12">
       <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] items-center">
@@ -98,7 +103,7 @@ const Home = () => {
               <article key={service.service_id} className="card p-6">
                 <h3 className="text-xl font-semibold mb-3">{service.name}</h3>
                 <p className="text-gray-600 mb-4">{service.description || 'Professional photography tailored to your needs.'}</p>
-                <p className="font-semibold text-primary mb-4">RWF {service.price?.toFixed(0) || 'Contact'}</p>
+                <p className="font-semibold text-primary mb-4">{formatPrice(service.price)}</p>
                 <Link to={`/services/${service.service_id}`} className="btn-outline">View details</Link>
               </article>
             )) : (

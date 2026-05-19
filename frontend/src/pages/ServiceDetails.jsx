@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { servicesService } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { formatPrice } from '../utils/format';
 
 const ServiceDetails = () => {
   const { id } = useParams();
@@ -33,7 +34,7 @@ const ServiceDetails = () => {
           <h1 className="section-title">{service.name}</h1>
           <p className="section-subtitle">{service.description || 'High-quality photography service customized for your event.'}</p>
           <div className="space-y-4 text-gray-700">
-            <p><strong>Price:</strong> RWF {service.price?.toFixed(0) || 'Contact us'}</p>
+            <p><strong>Price:</strong> {formatPrice(service.price, 'Contact us')}</p>
             <p><strong>Duration:</strong> {service.duration_hours || 'Flexible'} hours</p>
             <p><strong>Photos included:</strong> {service.includes_photos_count || 'TBD'}</p>
             <p><strong>Album included:</strong> {service.includes_album ? 'Yes' : 'No'}</p>

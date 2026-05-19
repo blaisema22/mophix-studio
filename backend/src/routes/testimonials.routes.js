@@ -11,6 +11,7 @@ router.get('/rating/average', testimonialsController.getAverageRating);
 
 // Client routes
 router.post('/', verifyToken, authorize('client'), testimonialsController.createTestimonial);
+router.get('/user', verifyToken, authorize('client'), testimonialsController.getUserTestimonials);
 
 // Admin routes
 router.get('/pending', verifyToken, authorize('admin'), testimonialsController.getPendingTestimonials);

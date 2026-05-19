@@ -10,12 +10,21 @@ const path = require('path');
 // Get all galleries
 const getAllGalleries = async (req, res, next) => {
     try {
-        const { is_published = true, page = 1, limit = 12 } = req.query;
+        const { is_published = true, created_by, page = 1, limit = 12 } = req.query;
         
         const offset = (page - 1) * limit;
+        const where = { is_published: is_published === 'true' };
+
+        if (created_by) {
+            where.created_by = parseInt(created_by);
+        }
+
+        if (req.user?.role === 'client' && !created_by) {
+            where.created_by = req.user.user_id;
+        }
 
         const { count, rows } = await Gallery.findAndCountAll({
-            where: { is_published: is_published === 'true' },
+            where,
             include: [
                 { model: User, attributes: ['first_name', 'last_name'] }
             ],

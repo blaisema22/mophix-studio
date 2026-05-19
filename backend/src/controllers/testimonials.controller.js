@@ -1,6 +1,6 @@
 // Testimonials Controller
 
-const { Testimonial, User, Booking } = require('../models');
+const { Testimonial, User, Booking, Service } = require('../models');
 const { AppError } = require('../middleware/errorHandler');
 const { Op } = require('sequelize');
 
@@ -144,6 +144,37 @@ const rejectTestimonial = async (req, res, next) => {
         res.json({
             success: true,
             message: 'Testimonial rejected and deleted'
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Get user testimonials
+const getUserTestimonials = async (req, res, next) => {
+    try {
+        const { page = 1, limit = 20 } = req.query;
+        const offset = (page - 1) * limit;
+
+        const { count, rows } = await Testimonial.findAndCountAll({
+            where: { user_id: req.user.user_id },
+            include: [
+                { model: Booking, include: [{ model: Service, attributes: ['name'] }] }
+            ],
+            offset: parseInt(offset),
+            limit: parseInt(limit),
+            order: [['created_at', 'DESC']]
+        });
+
+        res.json({
+            success: true,
+            data: rows,
+            pagination: {
+                total: count,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                pages: Math.ceil(count / limit)
+            }
         });
     } catch (error) {
         next(error);

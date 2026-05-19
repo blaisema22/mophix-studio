@@ -1,0 +1,8 @@
+# Ignore backend files during Vercel build
+backend
+database
+project-docs
+.git
+.env
+.env.*
+node_modules

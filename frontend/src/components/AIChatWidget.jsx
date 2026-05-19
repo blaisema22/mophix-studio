@@ -48,7 +48,8 @@ export default function AIChatWidget() {
                 messages: updated.filter(m => m.role !== 'assistant' || updated.indexOf(m) > 0)
             });
             setMessages(prev => [...prev, { role: 'assistant', content: result.message }]);
-        } catch {
+        } catch (error) {
+            console.error('AI chat request failed:', error);
             setMessages(prev => [...prev, {
                 role: 'assistant',
                 content: "Sorry, I'm having trouble connecting right now. Please try our Contact page for assistance."

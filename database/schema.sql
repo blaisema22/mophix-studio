@@ -1,5 +1,10 @@
 -- MOPHIX STUDIO - DATABASE SCHEMA
--- Compatible with MySQL 8.0+ and PostgreSQL 12+
+-NT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),- Compatible with MySQL 8.0+ and PostgreSQL 12+
 -- Created: 2024
 
 -- =====================================================
@@ -14,12 +19,7 @@
 -- =====================================================
 
 CREATE TABLE users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    phone VARCHAR(20),
+    user_id I
     role ENUM('admin', 'staff', 'client') DEFAULT 'client',
     profile_image_url VARCHAR(500),
     bio TEXT,

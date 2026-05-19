@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { servicesService, bookingsService } from '../services/api';
 import { useAuthStore } from '../store';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { formatPrice } from '../utils/format';
 
 const BookingRequest = () => {
   const { serviceId } = useParams();
@@ -86,7 +87,7 @@ const BookingRequest = () => {
           <div className="card p-6">
             <h2 className="text-2xl font-semibold mb-4">{service?.name || 'Selected service'}</h2>
             <p className="text-gray-700 mb-2">{service?.description || 'Please provide your event details.'}</p>
-            <p className="text-primary font-semibold">Price: RWF {service?.price?.toFixed(0) || 'Contact'}</p>
+            <p className="text-primary font-semibold">Price: {formatPrice(service?.price)}</p>
           </div>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid gap-6 md:grid-cols-2">

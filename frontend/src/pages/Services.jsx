@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { servicesService } from '../services/api';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { formatPrice } from '../utils/format';
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -49,7 +50,7 @@ const Services = () => {
             <article key={service.service_id} className="card p-6 bg-white/90 shadow-lg">
               <h2 className="text-2xl font-semibold mb-2">{service.name}</h2>
               <p className="text-gray-600 mb-4">{service.description || 'A premium photography package designed for your story.'}</p>
-              <p className="text-lg font-semibold text-primary mb-4">RWF {service.price?.toFixed(0) || 'Contact'}</p>
+              <p className="text-lg font-semibold text-primary mb-4">{formatPrice(service.price)}</p>
               <Link to={`/services/${service.service_id}`} className="btn-outline">View details</Link>
             </article>
           ))}
