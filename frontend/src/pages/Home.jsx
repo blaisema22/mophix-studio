@@ -12,6 +12,22 @@ const heroImages = [
   `${process.env.PUBLIC_URL}/assets/image (5).jpeg`,
 ];
 
+const popularServiceImages = {
+  wedding: `${process.env.PUBLIC_URL}/assets/wedding.jpeg`,
+  maternity: `${process.env.PUBLIC_URL}/assets/pregnancy.webp`,
+  pregnancy: `${process.env.PUBLIC_URL}/assets/pregnancy.webp`,
+  family: `${process.env.PUBLIC_URL}/assets/Family.jpeg`,
+};
+
+const getPopularServiceImage = (service) => {
+  const category = (service.category || service.name || '').toString().trim().toLowerCase();
+  if (popularServiceImages[category]) return popularServiceImages[category];
+  if (category.includes('wedding')) return popularServiceImages.wedding;
+  if (category.includes('pregnancy') || category.includes('maternity')) return popularServiceImages.maternity;
+  if (category.includes('family')) return popularServiceImages.family;
+  return `${process.env.PUBLIC_URL}/assets/image (1).jpeg`;
+};
+
 const Home = () => {
   const [services, setServices] = useState([]);
   const [galleries, setGalleries] = useState([]);
@@ -79,6 +95,14 @@ const Home = () => {
     };
 
     loadContent();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -165,14 +189,35 @@ const Home = () => {
           <LoadingSpinner />
         ) : (
           <div className="grid gap-6 md:grid-cols-3">
-            {services.length > 0 ? services.map((service) => (
-              <article key={service.service_id} className="card p-6">
-                <h3 className="text-xl font-semibold mb-3">{service.name}</h3>
-                <p className="text-gray-600 mb-4">{service.description || 'Professional photography tailored to your needs.'}</p>
-                <p className="font-semibold text-primary mb-4">RWF {service.price?.toFixed(0) || 'Contact'}</p>
-                <Link to={`/services/${service.service_id}`} className="btn-outline">View details</Link>
-              </article>
-            )) : (
+            {services.length > 0 ? services.map((service) => {
+              const displayPrice = formatPrice(service.price, 0);
+              const cardImage = getPopularServiceImage(service);
+
+              return (
+                <article key={service.service_id} className="card overflow-hidden shadow-lg">
+                  <div className="h-56 overflow-hidden">
+                    <img
+                      src={encodeURI(cardImage)}
+                      alt={service.category || service.name}
+                      className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <div className="mb-3 flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
+                        {service.category || 'Photography'}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2 leading-tight">{service.name}</h3>
+                    <p className="text-gray-300 leading-relaxed mb-4">{service.description || 'A premium photography package designed for your story.'}</p>
+                    <p className="font-semibold text-primary mb-3">
+                      {displayPrice ? `RWF ${displayPrice}k` : 'Contact'}
+                    </p>
+                    <Link to={`/services/${service.service_id}`} className="btn-outline">View details</Link>
+                  </div>
+                </article>
+              );
+            }) : (
               <div className="text-center text-gray-600">No services available at the moment.</div>
             )}
           </div>

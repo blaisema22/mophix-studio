@@ -4,6 +4,20 @@ import { Link } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 import formatPrice from '../utils/formatPrice';
 
+const serviceImages = {
+  family: `${process.env.PUBLIC_URL}/assets/Family.jpeg`,
+  graduation: `${process.env.PUBLIC_URL}/assets/graduationmm.jpeg`,
+  outdoor: `${process.env.PUBLIC_URL}/assets/outdoor.jpeg`,
+  pregnancy: `${process.env.PUBLIC_URL}/assets/pregnancy.webp`,
+  studio: `${process.env.PUBLIC_URL}/assets/studio.webp`,
+  wedding: `${process.env.PUBLIC_URL}/assets/wedding.jpeg`,
+};
+
+const getServiceImage = (category) => {
+  const lookup = (category || '').toString().trim().toLowerCase();
+  return serviceImages[lookup] || `${process.env.PUBLIC_URL}/assets/image (1).jpeg`;
+};
+
 const Services = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,24 +62,32 @@ const Services = () => {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => {
             const displayPrice = formatPrice(service.price, 0);
+            const backgroundImage = getServiceImage(service.category || service.name);
 
             return (
-              <article key={service.service_id} className="card p-6">
-                <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+              <article key={service.service_id} className="card overflow-hidden shadow-lg">
+                <div className="h-56 overflow-hidden">
                   <img
-                    src={`${process.env.PUBLIC_URL}/assets/image (1).webp`}
-                    alt="service"
-                    className="h-6 w-6 rounded-full object-cover"
+                    src={encodeURI(backgroundImage)}
+                    alt={service.category || service.name}
+                    className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105"
                   />
-                  {service.name}
-                </h3>
-                <p className="text-gray-600 mb-4">{service.description || 'A premium photography package designed for your story.'}</p>
-                <p className="font-semibold text-primary mb-4">
-                  {displayPrice ? `RWF ${displayPrice}` : 'Contact'}
-                </p>
-                <Link to={`/services/${service.service_id}`} className="btn-outline">
-                  View details
-                </Link>
+                </div>
+                <div className="p-6">
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
+                      {service.category || 'Photography'}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 leading-tight">{service.name}</h3>
+                  <p className="text-gray-300  leading-relaxed">{service.description || 'A premium photography package designed for your story.'}</p>
+                  <p className="font-semibold text-primary mb-3">
+                    {displayPrice ? `RWF ${displayPrice}k` : 'Contact'}
+                  </p>
+                  <Link to={`/services/${service.service_id}`} className="btn-outline">
+                    View details
+                  </Link>
+                </div>
               </article>
             );
           })}

@@ -1,6 +1,6 @@
 // Main App Component
 
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from './store';
 import { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
@@ -87,128 +87,7 @@ function AppContent() {
             {!hideNavbar && <Navbar />}
             
             <main className="flex-1">
-                <Routes>
-                        {/* Public Routes */}
-                        <Route path="/" element={<Home />} />
-                        <Route path="/portfolio" element={<Portfolio />} />
-                        <Route path="/services" element={<Services />} />
-                        <Route path="/services/:id" element={<ServiceDetails />} />
-                        <Route path="/blog" element={<Blog />} />
-                        <Route path="/blog/:slug" element={<BlogPost />} />
-                        <Route path="/contact" element={<Contact />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
-
-                        {/* Client Routes */}
-                        <Route
-                            path="/book/:serviceId"
-                            element={
-                                <ProtectedRoute requiredRole="client">
-                                    <BookingRequest />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/dashboard/*"
-                            element={
-                                <ProtectedRoute requiredRole="client">
-                                    <DashboardLayout />
-                                </ProtectedRoute>
-                            }
-                        >
-                            <Route index element={<DashboardHome />} />
-                            <Route path="bookings" element={<DashboardBookings />} />
-                            <Route path="bookings/new" element={<DashboardNewBooking />} />
-                            <Route path="bookings/upcoming" element={<DashboardUpcomingBookings />} />
-                            <Route path="bookings/history" element={<DashboardBookingHistory />} />
-                            <Route path="galleries" element={<DashboardGalleries />} />
-                            <Route path="galleries/view" element={<DashboardViewPhotos />} />
-                            <Route path="galleries/download" element={<DashboardDownloadPhotos />} />
-                            <Route path="testimonials" element={<DashboardTestimonials />} />
-                            <Route path="testimonials/write" element={<DashboardWriteReview />} />
-                            <Route path="testimonials/submitted" element={<DashboardSubmittedReviews />} />
-                            <Route path="account" element={<Navigate to="account/profile" replace />} />
-                            <Route path="account/profile" element={<DashboardProfile />} />
-                            <Route path="account/change-password" element={<DashboardChangePassword />} />
-                        </Route>
-                        <Route
-                            path="/my-bookings"
-                            element={
-                                <ProtectedRoute requiredRole="client">
-                                    <MyBookings />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/profile"
-                            element={
-                                <ProtectedRoute>
-                                    <MyProfile />
-                                </ProtectedRoute>
-                            }
-                        />
-
-                        {/* Admin Routes */}
-                        <Route
-                            path="/admin/dashboard"
-                            element={
-                                <ProtectedRoute requiredRole="admin">
-                                    <AdminDashboard />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/admin/galleries"
-                            element={
-                                <ProtectedRoute requiredRole="admin">
-                                    <AdminGalleries />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/admin/bookings"
-                            element={
-                                <ProtectedRoute requiredRole="admin">
-                                    <AdminBookings />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/admin/testimonials"
-                            element={
-                                <ProtectedRoute requiredRole="admin">
-                                    <AdminTestimonials />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/admin/inquiries"
-                            element={
-                                <ProtectedRoute requiredRole="admin">
-                                    <AdminInquiries />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/admin/blog"
-                            element={
-                                <ProtectedRoute requiredRole="admin">
-                                    <AdminBlog />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/admin/users"
-                            element={
-                                <ProtectedRoute requiredRole="admin">
-                                    <AdminUsers />
-                                </ProtectedRoute>
-                            }
-                        />
-
-                        {/* 404 */}
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
+                <Outlet />
             </main>
 
             <Toaster />
@@ -217,12 +96,65 @@ function AppContent() {
     );
 }
 
+const router = createBrowserRouter(
+    [
+        {
+            path: '/',
+            element: <AppContent />,
+            children: [
+                { index: true, element: <Home /> },
+                { path: 'portfolio', element: <Portfolio /> },
+                { path: 'services', element: <Services /> },
+                { path: 'services/:id', element: <ServiceDetails /> },
+                { path: 'blog', element: <Blog /> },
+                { path: 'blog/:slug', element: <BlogPost /> },
+                { path: 'contact', element: <Contact /> },
+                { path: 'login', element: <Login /> },
+                { path: 'register', element: <Register /> },
+                { path: 'book/:serviceId', element: <ProtectedRoute requiredRole="client"><BookingRequest /></ProtectedRoute> },
+                {
+                    path: 'dashboard',
+                    element: <ProtectedRoute requiredRole="client"><DashboardLayout /></ProtectedRoute>,
+                    children: [
+                        { index: true, element: <DashboardHome /> },
+                        { path: 'bookings', element: <DashboardBookings /> },
+                        { path: 'bookings/new', element: <DashboardNewBooking /> },
+                        { path: 'bookings/upcoming', element: <DashboardUpcomingBookings /> },
+                        { path: 'bookings/history', element: <DashboardBookingHistory /> },
+                        { path: 'galleries', element: <DashboardGalleries /> },
+                        { path: 'galleries/view', element: <DashboardViewPhotos /> },
+                        { path: 'galleries/download', element: <DashboardDownloadPhotos /> },
+                        { path: 'testimonials', element: <DashboardTestimonials /> },
+                        { path: 'testimonials/write', element: <DashboardWriteReview /> },
+                        { path: 'testimonials/submitted', element: <DashboardSubmittedReviews /> },
+                        { path: 'account', element: <Navigate to="account/profile" replace /> },
+                        { path: 'account/profile', element: <DashboardProfile /> },
+                        { path: 'account/change-password', element: <DashboardChangePassword /> },
+                    ],
+                },
+                { path: 'my-bookings', element: <ProtectedRoute requiredRole="client"><MyBookings /></ProtectedRoute> },
+                { path: 'profile', element: <ProtectedRoute><MyProfile /></ProtectedRoute> },
+                { path: 'admin/dashboard', element: <ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute> },
+                { path: 'admin/galleries', element: <ProtectedRoute requiredRole="admin"><AdminGalleries /></ProtectedRoute> },
+                { path: 'admin/bookings', element: <ProtectedRoute requiredRole="admin"><AdminBookings /></ProtectedRoute> },
+                { path: 'admin/testimonials', element: <ProtectedRoute requiredRole="admin"><AdminTestimonials /></ProtectedRoute> },
+                { path: 'admin/inquiries', element: <ProtectedRoute requiredRole="admin"><AdminInquiries /></ProtectedRoute> },
+                { path: 'admin/blog', element: <ProtectedRoute requiredRole="admin"><AdminBlog /></ProtectedRoute> },
+                { path: 'admin/users', element: <ProtectedRoute requiredRole="admin"><AdminUsers /></ProtectedRoute> },
+                { path: '*', element: <Navigate to="/" replace /> },
+            ],
+        },
+    ],
+    {
+        future: {
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+        },
+    }
+);
+
 function App() {
-    return (
-        <Router>
-            <AppContent />
-        </Router>
-    );
+    return <RouterProvider router={router} />;
 }
 
 export default App;
