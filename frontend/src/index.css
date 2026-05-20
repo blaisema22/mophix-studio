@@ -76,6 +76,19 @@ h1, h2, h3, h4, h5, h6 {
     @apply text-3xl md:text-4xl font-serif font-bold mb-4 text-white;
 }
 
+.typing-cursor {
+    width: 1px;
+    height: 1.2em;
+    display: inline-block;
+    vertical-align: bottom;
+    background-color: #ff7f11;
+    animation: blink-cursor 1s steps(2, start) infinite;
+}
+
+@keyframes blink-cursor {
+    50% { background-color: transparent; }
+}
+
 .section-subtitle {
     @apply text-lg text-gray-300 mb-8;
 }
