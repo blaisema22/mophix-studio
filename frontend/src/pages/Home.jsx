@@ -19,6 +19,12 @@ const popularServiceImages = {
   family: `${process.env.PUBLIC_URL}/assets/Family.jpeg`,
 };
 
+const fallbackPortfolioImages = [
+  `${process.env.PUBLIC_URL}/assets/party.jpeg`,
+  `${process.env.PUBLIC_URL}/assets/Beautiful Model.jpg`,
+  `${process.env.PUBLIC_URL}/assets/image (3).jpeg`,
+];
+
 const getPopularServiceImage = (service) => {
   const category = (service.category || service.name || '').toString().trim().toLowerCase();
   if (popularServiceImages[category]) return popularServiceImages[category];
@@ -246,7 +252,21 @@ const Home = () => {
                 </div>
               </article>
             )) : (
-              <div className="text-center text-gray-600">No galleries published yet.</div>
+              fallbackPortfolioImages.map((src, index) => (
+                <article key={index} className="card overflow-hidden shadow-lg">
+                  <div className="h-48 overflow-hidden">
+                    <img
+                      src={encodeURI(src)}
+                      alt={`Portfolio fallback ${index + 1}`}
+                      className="w-full h-full object-cover object-center"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold mb-2">Portfolio Inspiration</h3>
+                    <p className="text-gray-600">New collections are coming soon — explore our featured portfolio when it is ready.</p>
+                  </div>
+                </article>
+              ))
             )}
           </div>
         )}
