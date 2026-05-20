@@ -54,7 +54,7 @@ const Contact = () => {
 
       <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6 text-black" onSubmit={handleSubmit}>
             <div className="grid gap-6 md:grid-cols-2">
               <input
                 className="input-field"
@@ -99,11 +99,17 @@ const Contact = () => {
           </form>
         </div>
 
-        <aside className="card p-8 bg-primary/5">
-          <h2 className="text-2xl font-semibold mb-4">Visit Studio</h2>
-          <p className="text-gray-700 mb-4">KG Kaserenge, Kigali, Rwanda</p>
-          <p className="text-gray-700 mb-4">Phone: +250 788 242290</p>
-          <p className="text-gray-700">Email: info@mophixstudio.rw</p>
+        <aside className="card p-8 bg-white/5 border border-white/10">
+          <h2 className="text-2xl font-semibold mb-4 text-orange-400">Visit Studio</h2>
+          <p className="text-gray-300 mb-4">KG Kaserenge, Kigali, Rwanda</p>
+          <div className="space-y-4">
+            <p className="text-gray-300"><span className="text-orange-400 font-bold">Phone:</span> +250 788 242290</p>
+            <p className="text-gray-300"><span className="text-orange-400 font-bold">Email:</span> info@mophixstudio.rw</p>
+          </div>
+          <div className="mt-8 pt-8 border-t border-white/10">
+            <h3 className="text-sm uppercase tracking-widest text-gray-500 mb-4">Business Hours</h3>
+            <p className="text-sm text-gray-400">Mon - Sat: 08:00 AM - 07:00 PM<br/>Sun: By appointment only</p>
+          </div>
         </aside>
       </div>
     </section>

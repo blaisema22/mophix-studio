@@ -1,23 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../store';
-import { bookingsService, galleriesService, testimonialsService } from '../../services/api';
+import { bookingsService, galleriesService } from '../../services/api';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
 const DashboardHome = () => {
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(true);
-  const [summary, setSummary] = useState({ upcoming: null, galleryCount: 0, recentGallery: null, averageRating: null });
+  const [summary, setSummary] = useState({ upcoming: null, galleryCount: 0, recentGallery: null });
 
   useEffect(() => {
     const loadSummary = async () => {
       if (!user) return;
 
       try {
-        const [bookingsResponse, galleriesResponse, ratingResponse] = await Promise.all([
+        const [bookingsResponse, galleriesResponse] = await Promise.all([
           bookingsService.getAll({ user_id: user.user_id, limit: 5 }),
           galleriesService.getAll({ created_by: user.user_id, is_published: true, limit: 5 }),
-          testimonialsService.getAverageRating(),
         ]);
 
         const bookings = bookingsResponse.data || [];
@@ -28,7 +27,6 @@ const DashboardHome = () => {
           upcoming,
           galleryCount: galleries.length,
           recentGallery: galleries[0] || null,
-          averageRating: ratingResponse.data?.average_rating || null,
         });
       } catch (error) {
         console.error(error);
@@ -142,12 +140,7 @@ const DashboardHome = () => {
                   <p className="text-sm text-gray-400">Email</p>
                   <p className="font-semibold text-white">{user?.email}</p>
                 </div>
-                {summary.averageRating && (
-                  <div className="rounded-2xl bg-white/5 p-5">
-                    <p className="text-sm text-gray-400">Studio Rating</p>
-                    <p className="font-semibold text-white">{summary.averageRating} / 5</p>
-                  </div>
-                )}
+                {/* Studio rating removed from menu display */}
               </div>
             </article>
           </section>

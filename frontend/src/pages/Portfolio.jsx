@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { galleriesService } from '../services/api';
+import { Link } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Portfolio = () => {
@@ -155,12 +156,12 @@ const Portfolio = () => {
                   </div>
                 </div>
                 <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <button
-                    type="button"
+                  <Link
+                    to={`/portfolio/${gallery.gallery_id}`}
                     className="btn-secondary"
                   >
                     View gallery
-                  </button>
+                  </Link>
                   <span className="text-sm text-gray-500">{gallery.created_by ? `Curated by user ${gallery.created_by}` : 'Curated by the studio'}</span>
                 </div>
               </div>

@@ -12,6 +12,7 @@ import AIChatWidget from './components/AIChatWidget';
 // Public Pages
 import Home from './pages/Home';
 import Portfolio from './pages/Portfolio';
+import GalleryDetail from './pages/GalleryDetail';
 import Services from './pages/Services';
 import ServiceDetails from './pages/ServiceDetails';
 import Blog from './pages/Blog';
@@ -49,6 +50,12 @@ import AdminBlog from './pages/admin/Blog';
 import AdminUsers from './pages/admin/Users';
 
 // Protected Route Component
+const normalizeRole = (role) => {
+    if (!role) return role;
+    if (role === 'customer') return 'client';
+    return role;
+};
+
 const ProtectedRoute = ({ children, requiredRole }) => {
     const { isAuthenticated, user } = useAuthStore();
 
@@ -56,7 +63,10 @@ const ProtectedRoute = ({ children, requiredRole }) => {
         return <Navigate to="/login" replace />;
     }
 
-    if (requiredRole && user?.role !== requiredRole && user?.role !== 'admin') {
+    const normalizedUserRole = normalizeRole(user?.role);
+    const normalizedRequiredRole = normalizeRole(requiredRole);
+
+    if (requiredRole && normalizedUserRole !== normalizedRequiredRole && normalizedUserRole !== 'admin') {
         return <Navigate to="/" replace />;
     }
 
@@ -104,6 +114,7 @@ const router = createBrowserRouter(
             children: [
                 { index: true, element: <Home /> },
                 { path: 'portfolio', element: <Portfolio /> },
+                { path: 'portfolio/:id', element: <GalleryDetail /> },
                 { path: 'services', element: <Services /> },
                 { path: 'services/:id', element: <ServiceDetails /> },
                 { path: 'blog', element: <Blog /> },

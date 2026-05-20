@@ -100,10 +100,8 @@ const DashboardLayout = () => {
                     className="flex w-full items-center justify-between gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-semibold text-gray-200 transition hover:bg-white/5"
                   >
                     <span className="flex items-center gap-3">
-                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-white/5 text-sm text-orange-300">
-                        {section.header.charAt(0)}
-                      </span>
-                      {!isCollapsed && <span>{section.header}</span>}
+                      {/* Removed circular initial badge; show label only */}
+                      {!isCollapsed && <span className="font-semibold">{section.header}</span>}
                     </span>
                     {!isCollapsed && (
                       <span className={`inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 transition ${openSections[section.header] ? 'bg-orange-500/10 text-orange-300' : 'text-gray-400'}`}>

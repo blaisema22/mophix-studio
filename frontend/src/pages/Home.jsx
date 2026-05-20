@@ -76,14 +76,6 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setHeroIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-    }, 6000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
     const loadContent = async () => {
       try {
         const [servicesResponse, galleriesResponse] = await Promise.all([
@@ -186,7 +178,7 @@ const Home = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="section-title">Popular Services</h2>
-            <p className="text-gray-600">Choose the right photography package for your next event.</p>
+            <p className="text-gray-400">Choose the right photography package for your next event.</p>
           </div>
           <Link to="/services" className="text-primary hover:underline">View all services</Link>
         </div>
@@ -234,7 +226,7 @@ const Home = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="section-title">Featured Portfolio</h2>
-            <p className="text-gray-600">A selection of recent shoots across weddings, events, and portraits.</p>
+            <p className="text-gray-400">A selection of recent shoots across weddings, events, and portraits.</p>
           </div>
           <Link to="/portfolio" className="text-primary hover:underline">View full portfolio</Link>
         </div>
@@ -244,13 +236,16 @@ const Home = () => {
         ) : (
           <div className="grid gap-6 md:grid-cols-3">
             {galleries.length > 0 ? galleries.map((gallery) => (
-              <article key={gallery.gallery_id} className="card overflow-hidden">
+              <Link to={`/portfolio/${gallery.gallery_id}`} key={gallery.gallery_id} className="card overflow-hidden shadow-xl border border-white/5 transition-transform hover:-translate-y-1 block">
                 <div className="h-48 bg-gray-200" style={{ backgroundImage: `url(${gallery.cover_image_path || 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80'})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2">{gallery.title}</h3>
-                  <p className="text-gray-600">{gallery.description || 'Beautiful gallery from a recent shoot.'}</p>
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-xl font-semibold">{gallery.title}</h3>
+                    <span className="text-[10px] bg-secondary/20 text-secondary px-2 py-0.5 rounded-full uppercase tracking-widest">{gallery.event_type || 'Session'}</span>
+                  </div>
+                  <p className="text-gray-400">{gallery.description || 'Beautiful gallery from a recent shoot.'}</p>
                 </div>
-              </article>
+              </Link>
             )) : (
               fallbackPortfolioImages.map((src, index) => (
                 <article key={index} className="card overflow-hidden shadow-lg">
@@ -262,8 +257,8 @@ const Home = () => {
                     />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-semibold mb-2">Portfolio Inspiration</h3>
-                    <p className="text-gray-600">New collections are coming soon — explore our featured portfolio when it is ready.</p>
+                    <h3 className="text-xl font-semibold mb-2 text-white">Portfolio Inspiration</h3>
+                    <p className="text-gray-400">New collections are coming soon — explore our featured portfolio when it is ready.</p>
                   </div>
                 </article>
               ))

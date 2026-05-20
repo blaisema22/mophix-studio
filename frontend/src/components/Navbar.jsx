@@ -38,7 +38,7 @@ const Navbar = () => {
         <div className="flex flex-wrap items-center gap-4">
           {isAuthenticated ? (
             <>
-              {user?.role === 'client' && (
+              {(user?.role === 'client' || user?.role === 'customer') && (
                 <Link to="/dashboard" className="text-sm text-gray-300 hover:text-orange-400">Dashboard</Link>
               )}
               {user?.role === 'admin' && (
@@ -72,7 +72,7 @@ const Navbar = () => {
             
             {isAuthenticated && (
               <div className="pt-5 mt-2 border-t border-white/5 flex flex-col gap-4">
-                {user?.role === 'client' && (
+                {(user?.role === 'client' || user?.role === 'customer') && (
                   <Link to="/dashboard" onClick={closeMobileMenu} className="text-gray-300 hover:text-orange-400">Dashboard</Link>
                 )}
                 {user?.role === 'admin' && (
