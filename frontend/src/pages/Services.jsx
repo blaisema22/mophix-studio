@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { servicesService } from '../services/api';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { formatPrice } from '../utils/format';
+import formatPrice from '../utils/formatPrice';
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -46,14 +46,29 @@ const Services = () => {
         <LoadingSpinner />
       ) : services.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {services.map((service) => (
-            <article key={service.service_id} className="card p-6 bg-white/90 shadow-lg">
-              <h2 className="text-2xl font-semibold mb-2">{service.name}</h2>
-              <p className="text-gray-600 mb-4">{service.description || 'A premium photography package designed for your story.'}</p>
-              <p className="text-lg font-semibold text-primary mb-4">{formatPrice(service.price)}</p>
-              <Link to={`/services/${service.service_id}`} className="btn-outline">View details</Link>
-            </article>
-          ))}
+          {services.map((service) => {
+            const displayPrice = formatPrice(service.price, 0);
+
+            return (
+              <article key={service.service_id} className="card p-6">
+                <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                  <img
+                    src={`${process.env.PUBLIC_URL}/assets/image (1).webp`}
+                    alt="service"
+                    className="h-6 w-6 rounded-full object-cover"
+                  />
+                  {service.name}
+                </h3>
+                <p className="text-gray-600 mb-4">{service.description || 'A premium photography package designed for your story.'}</p>
+                <p className="font-semibold text-primary mb-4">
+                  {displayPrice ? `RWF ${displayPrice}` : 'Contact'}
+                </p>
+                <Link to={`/services/${service.service_id}`} className="btn-outline">
+                  View details
+                </Link>
+              </article>
+            );
+          })}
         </div>
       ) : (
         <div className="text-center text-gray-600">No service packages are available yet.</div>
