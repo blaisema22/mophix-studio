@@ -65,7 +65,7 @@ const Login = () => {
           {error && <p className="text-sm text-orange-300">{error}</p>}
         </form>
         <p className="text-sm text-gray-300 mt-6">
-          Don’t have an account? <Link to="/register" className="text-orange-400 hover:text-orange-300">Create one now</Link>.
+          Don’t have an account? <Link to="/register" className="text-orange-400 hover:text-orange-300">Register now  </Link>
         </p>
       </div>
     </section>

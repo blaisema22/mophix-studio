@@ -166,13 +166,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Scroll to Discover Animation */}
-      <div className="mt-20 flex flex-col items-center opacity-60">
-        <span className="text-[10px] uppercase tracking-[0.4em] mb-4 text-gray-500 font-medium">Scroll to Discover</span>
-        <div className="w-[22px] h-[38px] rounded-full border-2 border-gray-600 flex justify-center p-1.5">
-          <div className="w-1 h-2 bg-orange-500 rounded-full animate-bounce" />
-        </div>
-      </div>
+      {/* Scroll prompt removed per request */}
 
       <div className="mt-16">
         <div className="flex items-center justify-between mb-6">

@@ -7,16 +7,43 @@ A **production-ready** photography studio website with full-stack implementation
 **Client**: Mophix Studio - Professional Photography Services  
 **Location**: Kigali, Rwanda  
 **Scope**: Complete website development with portfolio, booking system, and admin dashboard  
-**Status**: ✅ Ready for Deployment
+**Status**: ✅ Schema Complete | Implementation Phase 2 Active
+
+## 📊 Database Schema (12 Tables - May 2026)
+
+The database has been updated to a clean 12-table architecture:
+
+### Core Tables (4)
+- **users** - All system accounts (admin, staff, client)
+- **clients** - Extended client profiles (phone, address, DOB)
+- **categories** - Hierarchical photo categories
+- **services** - Photography packages
+
+### Booking & Gallery Tables (3)
+- **bookings** - Client booking requests
+- **galleries** - Photo albums linked to bookings
+- **photos** - Individual photos with ordering
+
+### Content & Engagement (4)
+- **testimonials** - Client reviews (approval workflow)
+- **blog_posts** - Articles and photography stories
+- **tags** - Blog post labels
+- **blog_post_tags** - Many-to-many junction table
+
+### Communication (1)
+- **contact_messages** - Public contact form submissions
+
+**Documentation**: See [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for complete details
 
 ## 📋 What's Included
 
 ### ✅ Completed Components
 
-1. **Database Design** (15 tables)
+1. **Database Design** (12 tables - Optimized)
    - Normalized SQL schema
    - All relationships defined
    - Ready for MySQL or PostgreSQL
+   - Migration guide included
 
 2. **Backend API** (Node.js/Express)
    - 50+ REST endpoints
@@ -32,9 +59,10 @@ A **production-ready** photography studio website with full-stack implementation
 
 4. **Documentation**
    - Functional requirements
-   - Database entities & relationships
+   - Database schema documentation
+   - Migration guide
+   - Implementation checklist
    - Deployment guide
-   - API documentation
 
 ## 🚀 Quick Start
 

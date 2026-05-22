@@ -1,4 +1,5 @@
 // Database Models - Sequelize ORM Definitions
+// Updated to align with 12-table schema
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
@@ -67,13 +68,13 @@ const User = sequelize.define('User', {
     tableName: 'users',
     timestamps: true,
     hooks: {
-        beforeCreate: async (user) => {
+        beforeCreate: async(user) => {
             if (user.password_hash) {
                 const salt = await bcrypt.genSalt(10);
                 user.password_hash = await bcrypt.hash(user.password_hash, salt);
             }
         },
-        beforeUpdate: async (user) => {
+        beforeUpdate: async(user) => {
             if (user.changed('password_hash')) {
                 const salt = await bcrypt.genSalt(10);
                 user.password_hash = await bcrypt.hash(user.password_hash, salt);
@@ -556,6 +557,89 @@ const BlogPost = sequelize.define('BlogPost', {
 });
 
 // =====================================================
+// GALLERY_SERVICE (Many-to-Many) MODEL
+// =====================================================
+
+const GalleryService = sequelize.define('GalleryService', {
+    gallery_service_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    gallery_id: { type: DataTypes.INTEGER, allowNull: false },
+    service_id: { type: DataTypes.INTEGER, allowNull: false }
+}, {
+    tableName: 'gallery_service',
+    timestamps: false
+});
+
+// =====================================================
+// PHOTO_CATEGORY (Many-to-Many) MODEL
+// =====================================================
+
+const PhotoCategory = sequelize.define('PhotoCategory', {
+    photo_category_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    photo_id: { type: DataTypes.INTEGER, allowNull: false },
+    category_id: { type: DataTypes.INTEGER, allowNull: false }
+}, {
+    tableName: 'photo_category',
+    timestamps: false
+});
+
+// =====================================================
+// INVOICE MODEL
+// =====================================================
+
+const Invoice = sequelize.define('Invoice', {
+    invoice_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    booking_id: { type: DataTypes.INTEGER, allowNull: false },
+    invoice_number: { type: DataTypes.STRING(50), allowNull: false, unique: true },
+    amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+    tax_amount: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
+    total_amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+    payment_method: { type: DataTypes.STRING(50) },
+    status: { type: DataTypes.ENUM('pending', 'paid', 'overdue', 'cancelled'), defaultValue: 'pending' },
+    issued_date: { type: DataTypes.DATE, defaultValue: sequelize.fn('NOW') },
+    due_date: { type: DataTypes.DATE },
+    paid_date: { type: DataTypes.DATE },
+    notes: { type: DataTypes.TEXT }
+}, {
+    tableName: 'invoices',
+    timestamps: true
+});
+
+// =====================================================
+// ACTIVITY LOG MODEL
+// =====================================================
+
+const ActivityLog = sequelize.define('ActivityLog', {
+    log_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    user_id: { type: DataTypes.INTEGER },
+    action: { type: DataTypes.STRING(50), allowNull: false },
+    entity_type: { type: DataTypes.STRING(50), allowNull: false },
+    entity_id: { type: DataTypes.INTEGER },
+    description: { type: DataTypes.TEXT },
+    ip_address: { type: DataTypes.STRING(45) }
+}, {
+    tableName: 'activity_logs',
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: false
+});
+
+// =====================================================
+// SETTINGS MODEL
+// =====================================================
+
+const Setting = sequelize.define('Setting', {
+    setting_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    setting_key: { type: DataTypes.STRING(100), unique: true, allowNull: false },
+    setting_value: { type: DataTypes.TEXT },
+    setting_type: { type: DataTypes.ENUM('string', 'integer', 'boolean', 'json'), defaultValue: 'string' }
+}, {
+    tableName: 'settings',
+    timestamps: true,
+    createdAt: false,
+    updatedAt: 'updated_at'
+});
+
+// =====================================================
 // ASSOCIATIONS (Relationships)
 // =====================================================
 
@@ -592,6 +676,19 @@ ContactInquiry.belongsTo(User, { foreignKey: 'responded_by' });
 // Blog associations
 BlogPost.belongsTo(BlogCategory, { foreignKey: 'category_id' });
 BlogPost.belongsTo(User, { foreignKey: 'author_id' });
+// GalleryService associations (many-to-many helpers)
+GalleryService.belongsTo(Gallery, { foreignKey: 'gallery_id' });
+GalleryService.belongsTo(Service, { foreignKey: 'service_id' });
+
+// PhotoCategory associations
+PhotoCategory.belongsTo(Photo, { foreignKey: 'photo_id' });
+PhotoCategory.belongsTo(Category, { foreignKey: 'category_id' });
+
+// Invoice associations
+Invoice.belongsTo(Booking, { foreignKey: 'booking_id' });
+
+// ActivityLog associations
+ActivityLog.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = {
     sequelize,
@@ -604,5 +701,10 @@ module.exports = {
     Testimonial,
     ContactInquiry,
     BlogCategory,
-    BlogPost
+    BlogPost,
+    GalleryService,
+    PhotoCategory,
+    Invoice,
+    ActivityLog,
+    Setting
 };

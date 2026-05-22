@@ -75,7 +75,6 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
 function AppContent() {
     const location = useLocation();
-    const { isAuthenticated } = useAuthStore();
     const hideNavbar = location.pathname.startsWith('/dashboard');
 
     useEffect(() => {

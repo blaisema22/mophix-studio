@@ -80,17 +80,17 @@ const DashboardLayout = () => {
   };
 
   return (
-    <section className="min-h-screen bg-[#070707] text-white py-6">
+    <section className="min-h-screen bg-gradient-to-br from-[#070707] via-[#050505] to-[#0a0a0a] text-white py-6">
       <div className="container mx-auto px-4">
         <div className="lg:flex lg:gap-6">
-          <aside className={`sticky top-6 self-start rounded-[1.5rem] border border-orange-500/20 bg-[#111111] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.35)] transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-[calc(100vh-4rem)] overflow-y-auto`}>
+          <aside className={`sticky top-6 self-start rounded-[1.5rem] border border-orange-500/20 bg-gradient-to-br from-[#090909] via-[#0f0f0f] to-[#060606] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.45)] transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-[calc(100vh-4rem)] overflow-y-auto`}>
             <div className={`mb-5 ${isCollapsed ? 'text-center' : ''}`}>
               <p className="text-[10px] uppercase tracking-[0.45em] text-orange-400/80">Client space</p>
             </div>
 
             <div className="space-y-4">
               {sections.map((section) => (
-                <div key={section.header} className="rounded-[1.5rem] border border-white/10 bg-[#0f0f0f] p-1">
+                <div key={section.header} className="rounded-[1.5rem] border border-white/10 bg-gradient-to-r from-[#0f0f0f] via-[#111111] to-[#0d0d0d] p-1">
                   <button
                     type="button"
                     onClick={() => setOpenSections((prev) => ({
@@ -143,7 +143,7 @@ const DashboardLayout = () => {
           </aside>
 
           <div className="flex-1">
-            <div className="mb-6 flex flex-col gap-4 rounded-[2rem] border border-orange-500/20 bg-[#111111] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.35)] md:flex-row md:items-center md:justify-between">
+            <div className="mb-6 flex flex-col gap-4 rounded-[2rem] border border-orange-500/20 bg-gradient-to-br from-[#090909] via-[#0e0e0e] to-[#080808] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.45)] md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-3">
                 <button
                   type="button"
@@ -175,7 +175,7 @@ const DashboardLayout = () => {
                     <span>{user?.first_name || 'User'}</span>
                   </button>
                   {profileOpen && (
-                    <div className="absolute right-0 mt-2 w-52 rounded-2xl border border-white/10 bg-[#111111] p-3 shadow-xl">
+                    <div className="absolute right-0 mt-2 w-52 rounded-2xl border border-white/10 bg-gradient-to-br from-[#090909] via-[#0d0d0d] to-[#0b0b0b] p-3 shadow-xl">
                       <button type="button" onClick={() => navigate('/dashboard/account/profile')} className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-white/5">My Profile</button>
                       <button type="button" onClick={() => navigate('/dashboard/account/change-password')} className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-white/5">Change Password</button>
                       <button type="button" onClick={handleLogout} className="w-full text-left px-3 py-2 text-sm text-orange-300 hover:bg-white/5">Log Out</button>
@@ -185,7 +185,7 @@ const DashboardLayout = () => {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-orange-500/20 bg-[#0f0f0f] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+            <div className="rounded-[2rem] border border-orange-500/20 bg-gradient-to-br from-[#090909] via-[#0d0d0d] to-[#070707] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
               <Outlet />
             </div>
           </div>
