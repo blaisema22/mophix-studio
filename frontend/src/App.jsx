@@ -40,7 +40,43 @@ import DashboardSubmittedReviews from './pages/dashboard/DashboardSubmittedRevie
 import DashboardProfile from './pages/dashboard/DashboardProfile';
 import DashboardChangePassword from './pages/dashboard/DashboardChangePassword';
 
+// Staff Pages
+import StaffDashboardLayout from './pages/staff/StaffDashboardLayout';
+import StaffDashboardHome from './pages/staff/StaffDashboardHome';
+
+import StaffBookingsAll from './pages/staff/StaffBookingsAll';
+import StaffBookingsPending from './pages/staff/StaffBookingsPending';
+import StaffBookingsCalendar from './pages/staff/StaffBookingsCalendar';
+import StaffBookingsUpdateStatus from './pages/staff/StaffBookingsUpdateStatus';
+
+import StaffClientsAll from './pages/staff/StaffClientsAll';
+import StaffClientsProfiles from './pages/staff/StaffClientsProfiles';
+import StaffClientsBookings from './pages/staff/StaffClientsBookings';
+
+import StaffPortfolioGalleries from './pages/staff/StaffPortfolioGalleries';
+import StaffPortfolioUpload from './pages/staff/StaffPortfolioUpload';
+import StaffPortfolioManage from './pages/staff/StaffPortfolioManage';
+import StaffPortfolioFeatured from './pages/staff/StaffPortfolioFeatured';
+
+import StaffServicesAll from './pages/staff/StaffServicesAll';
+import StaffServicesCategories from './pages/staff/StaffServicesCategories';
+
+import StaffBlogAll from './pages/staff/StaffBlogAll';
+import StaffBlogWrite from './pages/staff/StaffBlogWrite';
+import StaffBlogDrafts from './pages/staff/StaffBlogDrafts';
+import StaffBlogPublished from './pages/staff/StaffBlogPublished';
+
+import StaffMessagesUnread from './pages/staff/StaffMessagesUnread';
+import StaffMessagesAll from './pages/staff/StaffMessagesAll';
+import StaffMessagesReplied from './pages/staff/StaffMessagesReplied';
+import StaffMessagesArchived from './pages/staff/StaffMessagesArchived';
+
+import StaffAccountProfile from './pages/staff/StaffAccountProfile';
+import StaffAccountChangePassword from './pages/staff/StaffAccountChangePassword';
+
+
 // Admin Pages
+import AdminDashboardLayout from './pages/admin/AdminDashboardLayout';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminGalleries from './pages/admin/Galleries';
 import AdminBookings from './pages/admin/Bookings';
@@ -52,8 +88,7 @@ import AdminUsers from './pages/admin/Users';
 // Protected Route Component
 const normalizeRole = (role) => {
     if (!role) return role;
-    if (role === 'customer') return 'client';
-    return role;
+    return String(role).toLowerCase() === 'customer' ? 'client' : String(role).toLowerCase();
 };
 
 const ProtectedRoute = ({ children, requiredRole }) => {
@@ -75,7 +110,10 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
 function AppContent() {
     const location = useLocation();
-    const hideNavbar = location.pathname.startsWith('/dashboard');
+    const hideNavbar =
+        location.pathname.startsWith('/dashboard') ||
+        location.pathname.startsWith('/staff') ||
+        location.pathname.startsWith('/admin');
 
     useEffect(() => {
         // Initialize auth from localStorage
@@ -142,15 +180,52 @@ const router = createBrowserRouter(
                         { path: 'account/change-password', element: <DashboardChangePassword /> },
                     ],
                 },
+                {
+                    path: 'staff/dashboard',
+                    element: <ProtectedRoute requiredRole="staff"><StaffDashboardLayout /></ProtectedRoute>,
+                    children: [
+                        { index: true, element: <StaffDashboardHome /> },
+                        { path: 'bookings', element: <StaffBookingsAll /> },
+                        { path: 'bookings/pending', element: <StaffBookingsPending /> },
+                        { path: 'bookings/calendar', element: <StaffBookingsCalendar /> },
+                        { path: 'bookings/update-status', element: <StaffBookingsUpdateStatus /> },
+                        { path: 'clients', element: <StaffClientsAll /> },
+                        { path: 'clients/profiles', element: <StaffClientsProfiles /> },
+                        { path: 'clients/bookings', element: <StaffClientsBookings /> },
+                        { path: 'portfolio/galleries', element: <StaffPortfolioGalleries /> },
+                        { path: 'portfolio/upload', element: <StaffPortfolioUpload /> },
+                        { path: 'portfolio/manage', element: <StaffPortfolioManage /> },
+                        { path: 'portfolio/featured', element: <StaffPortfolioFeatured /> },
+                        { path: 'services', element: <StaffServicesAll /> },
+                        { path: 'services/categories', element: <StaffServicesCategories /> },
+                        { path: 'blog', element: <StaffBlogAll /> },
+                        { path: 'blog/write', element: <StaffBlogWrite /> },
+                        { path: 'blog/drafts', element: <StaffBlogDrafts /> },
+                        { path: 'blog/published', element: <StaffBlogPublished /> },
+                        { path: 'messages/unread', element: <StaffMessagesUnread /> },
+                        { path: 'messages', element: <StaffMessagesAll /> },
+                        { path: 'messages/replied', element: <StaffMessagesReplied /> },
+                        { path: 'messages/archived', element: <StaffMessagesArchived /> },
+                        { path: 'account/profile', element: <StaffAccountProfile /> },
+                        { path: 'account/change-password', element: <StaffAccountChangePassword /> },
+                    ],
+                },
+
                 { path: 'my-bookings', element: <ProtectedRoute requiredRole="client"><MyBookings /></ProtectedRoute> },
                 { path: 'profile', element: <ProtectedRoute><MyProfile /></ProtectedRoute> },
-                { path: 'admin/dashboard', element: <ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute> },
-                { path: 'admin/galleries', element: <ProtectedRoute requiredRole="admin"><AdminGalleries /></ProtectedRoute> },
-                { path: 'admin/bookings', element: <ProtectedRoute requiredRole="admin"><AdminBookings /></ProtectedRoute> },
-                { path: 'admin/testimonials', element: <ProtectedRoute requiredRole="admin"><AdminTestimonials /></ProtectedRoute> },
-                { path: 'admin/inquiries', element: <ProtectedRoute requiredRole="admin"><AdminInquiries /></ProtectedRoute> },
-                { path: 'admin/blog', element: <ProtectedRoute requiredRole="admin"><AdminBlog /></ProtectedRoute> },
-                { path: 'admin/users', element: <ProtectedRoute requiredRole="admin"><AdminUsers /></ProtectedRoute> },
+                {
+                    path: 'admin',
+                    element: <ProtectedRoute requiredRole="admin"><AdminDashboardLayout /></ProtectedRoute>,
+                    children: [
+                        { index: true, element: <AdminDashboard /> },
+                        { path: 'galleries', element: <AdminGalleries /> },
+                        { path: 'bookings', element: <AdminBookings /> },
+                        { path: 'testimonials', element: <AdminTestimonials /> },
+                        { path: 'inquiries', element: <AdminInquiries /> },
+                        { path: 'blog', element: <AdminBlog /> },
+                        { path: 'users', element: <AdminUsers /> },
+                    ],
+                },
                 { path: '*', element: <Navigate to="/" replace /> },
             ],
         },

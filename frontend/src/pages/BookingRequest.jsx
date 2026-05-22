@@ -2,20 +2,19 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { servicesService, bookingsService } from '../services/api';
 import { useAuthStore } from '../store';
-import LoadingSpinner from '../components/LoadingSpinner';
+import LoadingSpinner from '../components/LoadingSpinner'; // Keep this
 import { formatPrice } from '../utils/format';
-import { getMonthDates } from '../utils/calendar';
+import { useAvailableDates } from '../hooks/useAvailableDates';
+import { useSlotAvailability } from '../hooks/useSlotAvailability';
+import { TIME_SLOTS, getTimeSlotValues, isSlotBooked } from '../utils/booking';
 
 const BookingRequest = () => {
   const { serviceId } = useParams();
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const [service, setService] = useState(null);
-  const [calendarMonth, setCalendarMonth] = useState(new Date());
-  const [availableDates, setAvailableDates] = useState([]);
-  const [selectedCalendarDate, setSelectedCalendarDate] = useState('');
   const [formData, setFormData] = useState({
-    booking_date: '',
+    // booking_date: '', // Removed as it will be set automatically
     event_date: '',
     preferred_time_start: '',
     preferred_time_end: '',
@@ -25,7 +24,12 @@ const BookingRequest = () => {
   });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
   const [status, setStatus] = useState(null);
+  const [validationError, setValidationError] = useState(null); // New state for validation errors
+
+  const { availableDates: availableEventDates, loading: loadingAvailableDates } = useAvailableDates(serviceId);
+  const { occupiedSlots, allSlotsBooked, availableSlotsCount, loading: loadingSlots } = useSlotAvailability(formData.event_date);
 
   useEffect(() => {
     const fetchService = async () => {
@@ -43,22 +47,56 @@ const BookingRequest = () => {
   }, [serviceId]);
 
   useEffect(() => {
-    if (!serviceId) {
-      setAvailableDates([]);
-      setSelectedCalendarDate('');
-      return;
+    if (availableEventDates.length > 0 && !formData.event_date) {
+      setFormData(prev => ({ ...prev, event_date: availableEventDates[0].iso }));
+    } else if (formData.event_date && !availableEventDates.some(d => d.iso === formData.event_date)) {
+      setFormData(prev => ({ ...prev, event_date: '' }));
     }
-    setAvailableDates(getMonthDates(calendarMonth, serviceId));
-  }, [serviceId, calendarMonth]);
+  }, [availableEventDates, formData.event_date]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleTimeSlotChange = (e) => {
+    const values = getTimeSlotValues(e.target.value);
+    if (values) {
+      setFormData({
+        ...formData,
+        preferred_time_start: values.start,
+        preferred_time_end: values.end,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
       setStatus('You must be signed in to submit a booking request.');
+      return;
+    }
+    setValidationError(null); // Clear previous validation errors
+
+    // Prevent submission if all slots are booked or the specific selected slot is occupied
+    if (allSlotsBooked) {
+      setValidationError('All time slots for this date are fully booked. Please select another date.');
+      return;
+    }
+
+    const isSelectedSlotOccupied = occupiedSlots.some(
+      (slot) => slot.start === formData.preferred_time_start && slot.end === formData.preferred_time_end
+    );
+    if (isSelectedSlotOccupied) {
+      setValidationError('The selected time slot is already booked. Please choose another one.');
+      return;
+    }
+
+    // Client-side validation: Ensure event_date is not in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedEventDate = new Date(formData.event_date);
+    if (selectedEventDate < today) {
+      setValidationError('The preferred event date cannot be in the past.');
       return;
     }
 
@@ -69,7 +107,7 @@ const BookingRequest = () => {
       const payload = {
         user_id: user.user_id,
         service_id: serviceId,
-        booking_date: formData.booking_date,
+        booking_date: new Date().toISOString().split('T')[0], // Automatically set to current date
         preferred_time_start: formData.preferred_time_start,
         preferred_time_end: formData.preferred_time_end,
         event_date: formData.event_date,
@@ -110,76 +148,65 @@ const BookingRequest = () => {
             </div>
           </div>
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="rounded-3xl border border-white/10 bg-[#0b0b0b] p-4">
-              <div className="flex items-center justify-between mb-3 text-sm text-gray-300">
-                <span>{calendarMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
-                <div className="flex gap-2">
-                  <button type="button" onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))} className="rounded-full border border-white/10 px-3 py-1 text-xs text-gray-300 hover:bg-white/5">Prev</button>
-                  <button type="button" onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))} className="rounded-full border border-white/10 px-3 py-1 text-xs text-gray-300 hover:bg-white/5">Next</button>
+            <div className="grid gap-6 md:grid-cols-2">
+              <label className="block">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-700">Preferred Event Date</span>
+                  {loadingAvailableDates && (
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-orange-500" />
+                  )}
                 </div>
-              </div>
-              <div className="grid grid-cols-7 gap-2 text-center text-xs text-gray-500">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                  <div key={day} className="py-1">{day}</div>
-                ))}
-              </div>
-              <div className="grid grid-cols-7 gap-2 mt-2">
-                {availableDates.map((item, index) => {
-                  if (!item) {
-                    return <div key={`empty-${index}`} className="h-10 rounded-xl bg-white/5" />;
-                  }
-                  const isSelected = item.iso === selectedCalendarDate;
-                  return (
-                    <button
-                      type="button"
-                      key={item.iso}
-                      onClick={() => item.available && setSelectedCalendarDate(item.iso)}
-                      disabled={!item.available}
-                      className={`h-10 rounded-xl text-sm ${item.available ? 'bg-orange-500/20 text-orange-200 hover:bg-orange-500/30' : 'bg-white/5 text-gray-500 cursor-not-allowed'} ${isSelected ? 'ring-2 ring-orange-400' : ''}`}
-                    >
-                      {item.date.getDate()}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <div>
-                  <p className="text-xs text-gray-400">Selected date</p>
-                  <p className="text-sm text-white">{selectedCalendarDate || 'None selected'}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => selectedCalendarDate && setFormData({ ...formData, event_date: selectedCalendarDate })}
-                  disabled={!selectedCalendarDate}
-                  className="btn-secondary inline-flex items-center justify-center rounded-xl px-4 py-2 disabled:opacity-50"
+                <select
+                  className="input-field mt-2"
+                  name="event_date"
+                  value={formData.event_date}
+                  onChange={handleChange}
+                  required
+                  disabled={loadingAvailableDates} // Disable while loading
                 >
-                  Set date
-                </button>
+                  {loadingAvailableDates ? (
+                    <option value="">Loading available dates...</option>
+                  ) : (
+                    <>
+                      <option value="">Select a date</option>
+                      {availableEventDates.map((dateItem) => (
+                        <option key={dateItem.iso} value={dateItem.iso}>
+                          {new Date(dateItem.iso).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                          {dateItem.isLimited ? ' (Limited Availability)' : ''}
+                        </option>
+                      ))}
+                    </>
+                  )}
+                </select>
+                <span className="text-xs text-gray-500">Select your preferred date from available options. Staff will confirm the final date.</span>
+              </label>
+            </div>
+            <label className="block">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-700">Preferred Time Slot</span>
+                {loadingSlots && <div className="h-3 w-3 animate-spin rounded-full border-2 border-gray-300 border-t-orange-500" />}
               </div>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              <label className="block">
-                <span className="text-sm font-medium text-gray-700">Booking Date</span>
-                <input className="input-field mt-2" type="date" name="booking_date" value={formData.booking_date} onChange={handleChange} required />
-              </label>
-              <label className="block">
-                <span className="text-sm font-medium text-gray-700">Preferred Event Date</span>
-                <input className="input-field mt-2" type="date" name="event_date" value={formData.event_date} onChange={handleChange} />
-                <span className="text-xs text-gray-500">Optional — or choose a date from the calendar above.</span>
-              </label>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              <label className="block">
-                <span className="text-sm font-medium text-gray-700">Preferred Start Time</span>
-                <input className="input-field mt-2" type="time" name="preferred_time_start" value={formData.preferred_time_start} onChange={handleChange} />
-                <span className="text-xs text-gray-500">Optional — staff will confirm the final time.</span>
-              </label>
-              <label className="block">
-                <span className="text-sm font-medium text-gray-700">Preferred End Time</span>
-                <input className="input-field mt-2" type="time" name="preferred_time_end" value={formData.preferred_time_end} onChange={handleChange} />
-                <span className="text-xs text-gray-500">Optional — staff will confirm the final time.</span>
-              </label>
-            </div>
+              <select
+                onChange={handleTimeSlotChange}
+                className="input-field mt-2"
+                required
+                disabled={loadingSlots || !formData.event_date}
+              >
+                <option value="">{loadingSlots ? 'Checking availability...' : 'Select a time slot'}</option>
+                {TIME_SLOTS.map((slot) => (
+                  <option key={slot.label} value={slot.label} disabled={isSlotBooked(slot, occupiedSlots)}>
+                    {slot.label} {isSlotBooked(slot, occupiedSlots) ? '(Fully Booked)' : ''}
+                  </option>
+                ))}
+              </select>
+              <span className="text-xs text-gray-500">Staff will verify availability for the selected slot.</span>
+              {allSlotsBooked && (
+                <p className="text-sm text-orange-500 mt-2 font-medium">⚠️ All time slots for this date are fully booked. Please select another date.</p>
+              )}
+              {formData.event_date && !loadingSlots && !allSlotsBooked && availableSlotsCount === 1 && (
+                <p className="text-xs text-orange-400 font-medium mt-1">⚠️ Only 1 slot remaining for this date!</p>
+              )}
+            </label>
             <input className="input-field" type="text" name="event_location" placeholder="Event location" value={formData.event_location} onChange={handleChange} required />
             <input className="input-field" type="number" name="number_of_participants" min="1" placeholder="Number of participants" value={formData.number_of_participants} onChange={handleChange} required />
             <textarea className="input-field h-40" name="special_requests" placeholder="Special requests" value={formData.special_requests} onChange={handleChange} />
@@ -187,6 +214,7 @@ const BookingRequest = () => {
               {submitting ? 'Submitting...' : 'Submit Booking Request'}
             </button>
             {status && <p className="text-sm text-gray-700">{status}</p>}
+            {validationError && <p className="text-sm text-red-500 mt-2">{validationError}</p>} {/* Display validation error */}
           </form>
         </div>
 

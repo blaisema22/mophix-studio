@@ -1,10 +1,23 @@
 import { useState, useRef, useEffect } from 'react';
 import api from '../services/api';
+import {
+  HiOutlineChatBubbleLeftRight,
+  HiOutlinePaperAirplane,
+  HiOutlineSparkles,
+  HiOutlineXMark,
+} from 'react-icons/hi';
 
 const BOT_INTRO = {
     role: 'assistant',
     content: "Hi! I'm Mofix AI — your smart assistant. Ask me anything about our services, bookings, portfolio, or how to get started. I'm here to help!"
 };
+
+const SUGGESTED_QUESTIONS = [
+    "What are your wedding rates?",
+    "How do I book a session?",
+    "Show me your portfolio",
+    "Do you have maternity packages?"
+];
 
 function TypingDots() {
     return (
@@ -32,9 +45,8 @@ export default function AIChatWidget() {
         if (open) inputRef.current?.focus();
     }, [open]);
 
-    async function sendMessage(e) {
-        e.preventDefault();
-        const text = input.trim();
+    async function handleChatSubmit(textValue) {
+        const text = textValue?.trim();
         if (!text || loading) return;
 
         const userMsg = { role: 'user', content: text };
@@ -59,6 +71,11 @@ export default function AIChatWidget() {
         }
     }
 
+    async function sendMessage(e) {
+        e.preventDefault();
+        handleChatSubmit(input);
+    }
+
     return (
         <>
             {/* Chat Panel */}
@@ -71,7 +88,7 @@ export default function AIChatWidget() {
                 {/* Header */}
                 <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-orange-600 to-orange-500 rounded-t-2xl">
                     <div className="flex items-center justify-center w-9 h-9 rounded-full bg-black/30">
-                        <AIIcon />
+                        <HiOutlineSparkles className="h-6 w-6 text-orange-400" />
                     </div>
                     <div>
                         <p className="font-semibold text-black text-sm leading-tight">Mofix AI Assistant</p>
@@ -82,9 +99,7 @@ export default function AIChatWidget() {
                         className="ml-auto text-black/60 hover:text-black transition-colors"
                         aria-label="Close chat"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <HiOutlineXMark className="w-5 h-5" />
                     </button>
                 </div>
 
@@ -94,7 +109,7 @@ export default function AIChatWidget() {
                         <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                             {msg.role === 'assistant' && (
                                 <div className="flex-shrink-0 w-7 h-7 rounded-full bg-orange-500/20 border border-orange-500/40 flex items-center justify-center mr-2 mt-0.5">
-                                    <AIIcon small />
+                                    <HiOutlineSparkles className="h-4 w-4 text-orange-400" />
                                 </div>
                             )}
                             <div
@@ -111,7 +126,7 @@ export default function AIChatWidget() {
                     {loading && (
                         <div className="flex justify-start">
                             <div className="flex-shrink-0 w-7 h-7 rounded-full bg-orange-500/20 border border-orange-500/40 flex items-center justify-center mr-2 mt-0.5">
-                                <AIIcon small />
+                                <HiOutlineSparkles className="h-4 w-4 text-orange-400" />
                             </div>
                             <div className="bg-neutral-800 rounded-2xl rounded-bl-sm">
                                 <TypingDots />
@@ -120,6 +135,21 @@ export default function AIChatWidget() {
                     )}
                     <div ref={bottomRef} />
                 </div>
+
+                {/* Suggestions */}
+                {!loading && messages.length < 4 && (
+                    <div className="px-4 pb-2 flex gap-2 overflow-x-auto no-scrollbar">
+                        {SUGGESTED_QUESTIONS.map((q, i) => (
+                            <button
+                                key={i}
+                                onClick={() => handleChatSubmit(q)}
+                                className="whitespace-nowrap px-3 py-1.5 rounded-full border border-orange-500/30 bg-orange-500/5 text-[11px] text-orange-300 hover:bg-orange-500/20 transition-colors"
+                            >
+                                {q}
+                            </button>
+                        ))}
+                    </div>
+                )}
 
                 {/* Input */}
                 <form onSubmit={sendMessage} className="flex items-center gap-2 p-3 border-t border-white/10">
@@ -137,9 +167,7 @@ export default function AIChatWidget() {
                         className="flex-shrink-0 w-9 h-9 rounded-xl bg-orange-500 hover:bg-orange-400 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                         aria-label="Send"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                        </svg>
+                        <HiOutlinePaperAirplane className="w-4 h-4 text-black" />
                     </button>
                 </form>
             </div>
@@ -148,16 +176,12 @@ export default function AIChatWidget() {
             <button
                 onClick={() => setOpen(prev => !prev)}
                 className="fixed bottom-5 right-5 z-50 w-14 h-14 rounded-full bg-orange-500 hover:bg-orange-400 shadow-[0_4px_24px_rgba(249,115,22,0.5)] flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
-                aria-label="Open AI chat"
+                aria-label={open ? 'Close AI chat' : 'Open AI chat'}
             >
                 {open ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <HiOutlineXMark className="w-6 h-6 text-black" />
                 ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
+                    <HiOutlineChatBubbleLeftRight className="w-6 h-6 text-black" />
                 )}
                 {/* Pulse ring */}
                 {!open && (
@@ -165,27 +189,5 @@ export default function AIChatWidget() {
                 )}
             </button>
         </>
-    );
-}
-
-function AIIcon({ small = false }) {
-    const size = small ? 14 : 22;
-    return (
-        <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            width={size} 
-            height={size} 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth={2} 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            className={small ? 'text-orange-400' : 'text-black'}
-        >
-            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-            <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5z"/>
-            <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z"/>
-        </svg>
     );
 }

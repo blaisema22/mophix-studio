@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore, useUIStore } from '../store';
+import { HiOutlineMenu, HiOutlineXMark } from 'react-icons/hi';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -19,10 +20,13 @@ const Navbar = () => {
           <button 
             onClick={toggleMobileMenu}
             className="md:hidden text-accent hover:text-orange-400 focus:outline-none"
+            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-            </svg>
+            {isMobileMenuOpen ? (
+              <HiOutlineXMark className="h-6 w-6" />
+            ) : (
+              <HiOutlineMenu className="h-6 w-6" />
+            )}
           </button>
           <Link to="/" onClick={closeMobileMenu} className="text-2xl font-serif text-orange-400 tracking-[0.08em] whitespace-nowrap">Mophix Studio</Link>
         </div>

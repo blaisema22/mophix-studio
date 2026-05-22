@@ -23,7 +23,9 @@ const Login = () => {
       loginStore(payload.user, payload.token);
       localStorage.setItem('token', payload.token);
       localStorage.setItem('user', JSON.stringify(payload.user));
-      const destination = payload.user?.role === 'admin' ? '/admin/dashboard' : '/dashboard';
+      const role = String(payload.user?.role || '').toLowerCase();
+      const destination =
+        role === 'admin' ? '/admin/dashboard' : role === 'staff' ? '/staff/dashboard' : '/dashboard';
       navigate(destination);
     } catch (err) {
       console.error(err);

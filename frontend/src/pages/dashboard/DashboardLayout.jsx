@@ -1,6 +1,13 @@
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store';
 import { useEffect, useState } from 'react';
+import {
+  HiOutlineBell,
+  HiOutlineCalendar,
+  HiOutlineChevronDown,
+  HiOutlineChevronUp,
+  HiOutlineMenu,
+} from 'react-icons/hi';
 
 const sections = [
   {
@@ -105,7 +112,11 @@ const DashboardLayout = () => {
                     </span>
                     {!isCollapsed && (
                       <span className={`inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 transition ${openSections[section.header] ? 'bg-orange-500/10 text-orange-300' : 'text-gray-400'}`}>
-                        {openSections[section.header] ? '−' : '+'}
+                        {openSections[section.header] ? (
+                          <HiOutlineChevronUp className="h-4 w-4" />
+                        ) : (
+                          <HiOutlineChevronDown className="h-4 w-4" />
+                        )}
                       </span>
                     )}
                   </button>
@@ -149,8 +160,9 @@ const DashboardLayout = () => {
                   type="button"
                   onClick={() => setIsCollapsed((prev) => !prev)}
                   className="hidden lg:inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-gray-300 hover:border-orange-500/40 hover:bg-white/10"
+                  aria-label="Toggle sidebar"
                 >
-                  <span className="text-xl">☰</span>
+                  <HiOutlineMenu className="h-5 w-5" />
                 </button>
                 <div>
                   <p className="text-sm uppercase tracking-[0.4em] text-gray-500">Current page</p>
@@ -159,11 +171,11 @@ const DashboardLayout = () => {
               </div>
 
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
-                <button className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-gray-300 hover:border-orange-500/40 hover:bg-white/10">
-                  🔔
+                <button className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-gray-300 hover:border-orange-500/40 hover:bg-white/10" aria-label="Notifications">
+                  <HiOutlineBell className="h-5 w-5" />
                 </button>
                 <button onClick={() => navigate('/dashboard/bookings/new')} className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-gray-300 hover:border-orange-500/40 hover:bg-white/10">
-                  📅 Book a Session
+                  <HiOutlineCalendar className="h-5 w-5 mr-2" /> Book a Session
                 </button>
                 <div className="relative">
                   <button

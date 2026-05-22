@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { bookingsService, servicesService } from '../../services/api';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { getMonthDates } from '../../utils/calendar';
+import { useAvailableDates } from '../../hooks/useAvailableDates';
+
+import { useSlotAvailability } from '../../hooks/useSlotAvailability';
+import { TIME_SLOTS, getTimeSlotValues, isSlotBooked } from '../../utils/booking';
 
 const DashboardNewBooking = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [calendarMonth, setCalendarMonth] = useState(new Date());
-  const [availableDates, setAvailableDates] = useState([]);
-  const [selectedCalendarDate, setSelectedCalendarDate] = useState('');
   const [form, setForm] = useState({
     service_id: '',
     event_date: '',
@@ -21,16 +21,16 @@ const DashboardNewBooking = () => {
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
 
+  const { availableDates: availableEventDates, loading: loadingAvailableDates } = useAvailableDates(form.service_id);
+  const { occupiedSlots, allSlotsBooked, availableSlotsCount, loading: loadingSlots } = useSlotAvailability(form.event_date);
+
   const selectedService = services.find((service) => String(service.service_id) === String(form.service_id));
 
   useEffect(() => {
-    if (!form.service_id) {
-      setAvailableDates([]);
-      setSelectedCalendarDate('');
-      return;
+    if (availableEventDates.length > 0 && !form.event_date) {
+      setForm(prev => ({ ...prev, event_date: availableEventDates[0].iso }));
     }
-    setAvailableDates(getMonthDates(calendarMonth, form.service_id));
-  }, [form.service_id, calendarMonth]);
+  }, [availableEventDates, form.event_date]);
 
   useEffect(() => {
     const loadServices = async () => {
@@ -52,10 +52,44 @@ const DashboardNewBooking = () => {
     setForm({ ...form, [e.target.name]: value });
   };
 
+  const handleTimeSlotChange = (e) => {
+    const values = getTimeSlotValues(e.target.value);
+    if (values) {
+      setForm({
+        ...form,
+        preferred_time_start: values.start,
+        preferred_time_end: values.end
+      });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('');
     setError('');
+
+    // Prevent submission if all slots are booked or the specific selected slot is occupied
+    if (allSlotsBooked) {
+      setError('No slots available for this date. Please choose a different date.');
+      return;
+    }
+
+    const isSelectedSlotOccupied = occupiedSlots.some(
+      (slot) => slot.start === form.preferred_time_start && slot.end === form.preferred_time_end
+    );
+    if (isSelectedSlotOccupied) {
+      setError('The selected time slot is already booked. Please choose another one.');
+      return;
+    }
+
+    // Client-side validation: Ensure event_date is not in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedEventDate = new Date(form.event_date);
+    if (selectedEventDate < today) {
+      setError('The preferred event date cannot be in the past.');
+      return;
+    }
 
     try {
       const payload = {
@@ -107,82 +141,77 @@ const DashboardNewBooking = () => {
               </select>
             </label>
 
-            {selectedService && (
-              <div className="space-y-4">
-                <div className="rounded-2xl border border-orange-500/20 bg-[#0c0c0c] p-4 text-sm text-gray-300">
-                  <p className="font-semibold text-white">Service schedule note</p>
-                  <p>The staff will confirm the exact session date and available start/end time after reviewing the selected service.</p>
-                  {selectedService.duration_hours ? (
-                    <p>Estimated session length: {selectedService.duration_hours} hour{selectedService.duration_hours > 1 ? 's' : ''}.</p>
-                  ) : null}
-                </div>
-
-                <div className="rounded-3xl border border-white/10 bg-[#0b0b0b] p-4">
-                  <div className="flex items-center justify-between mb-3 text-sm text-gray-300">
-                    <span>{calendarMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
-                    <div className="flex gap-2">
-                      <button type="button" onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))} className="rounded-full border border-white/10 px-3 py-1 text-xs text-gray-300 hover:bg-white/5">Prev</button>
-                      <button type="button" onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))} className="rounded-full border border-white/10 px-3 py-1 text-xs text-gray-300 hover:bg-white/5">Next</button>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-7 gap-2 text-center text-xs text-gray-500">
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                      <div key={day} className="py-1">{day}</div>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-7 gap-2 mt-2">
-                    {availableDates.map((item, index) => {
-                      if (!item) {
-                        return <div key={`empty-${index}`} className="h-10 rounded-xl bg-white/5" />;
-                      }
-                      const isSelected = item.iso === selectedCalendarDate;
-                      return (
-                        <button
-                          type="button"
-                          key={item.iso}
-                          onClick={() => item.available && setSelectedCalendarDate(item.iso)}
-                          disabled={!item.available}
-                          className={`h-10 rounded-xl text-sm ${item.available ? 'bg-orange-500/20 text-orange-200 hover:bg-orange-500/30' : 'bg-white/5 text-gray-500 cursor-not-allowed'} ${isSelected ? 'ring-2 ring-orange-400' : ''}`}
-                        >
-                          {item.date.getDate()}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="mt-4 flex items-center gap-3">
-                    <div>
-                      <p className="text-xs text-gray-400">Selected date</p>
-                      <p className="text-sm text-white">{selectedCalendarDate || 'None selected'}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => selectedCalendarDate && setForm({ ...form, event_date: selectedCalendarDate })}
-                      disabled={!selectedCalendarDate}
-                      className="btn-primary px-4 py-2 disabled:opacity-50"
-                    >
-                      Set date
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <label className="block text-sm text-gray-300">
-              Session Date
-              <input type="date" name="event_date" value={form.event_date} onChange={handleChange} className="input-field mt-2 bg-[#0b0b0b]" />
+              <div className="flex items-center gap-2">
+                <span>Preferred Session Date</span>
+                {loadingAvailableDates && (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-500 border-t-orange-500" />
+                )}
+              </div>
+              <select
+                name="event_date"
+                value={form.event_date}
+                onChange={handleChange}
+                required
+                disabled={loadingAvailableDates || !form.service_id}
+                className="input-field mt-2 bg-[#0b0b0b]"
+              >
+                {loadingAvailableDates ? (
+                  <option value="">Loading available dates...</option>
+                ) : !form.service_id ? (
+                  <option value="">Choose a service first</option>
+                ) : (
+                  <>
+                    <option value="">Select a date</option>
+                    {availableEventDates.map((dateItem) => (
+                      <option key={dateItem.iso} value={dateItem.iso}>
+                        {new Date(dateItem.iso).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                        {dateItem.isLimited ? ' (Limited Availability)' : ''}
+                      </option>
+                    ))}
+                  </>
+                )}
+              </select>
+              <span className="text-xs text-gray-500">Select an available date. Staff will confirm final availability.</span>
             </label>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
+          {selectedService && (
+            <div className="rounded-2xl border border-orange-500/20 bg-[#0c0c0c] p-4 text-sm text-gray-300">
+              <p className="font-semibold text-white">Service schedule note</p>
+              <p>The staff will confirm the exact session date and available start/end time after reviewing the selected service.</p>
+              {selectedService.duration_hours ? (
+                <p>Estimated session length: {selectedService.duration_hours} hour{selectedService.duration_hours > 1 ? 's' : ''}.</p>
+              ) : null}
+            </div>
+          )}
+
+          <div className="grid gap-6 md:grid-cols-1">
             <label className="block text-sm text-gray-300">
-              Preferred Start Time
-              <input type="time" name="preferred_time_start" value={form.preferred_time_start} onChange={handleChange} className="input-field mt-2 bg-[#0b0b0b]" />
-              <span className="text-xs text-gray-500">Optional — staff will confirm the final time.</span>
-            </label>
-            <label className="block text-sm text-gray-300">
-              Preferred End Time
-              <input type="time" name="preferred_time_end" value={form.preferred_time_end} onChange={handleChange} className="input-field mt-2 bg-[#0b0b0b]" />
-              <span className="text-xs text-gray-500">Optional — staff will confirm the final time.</span>
+              <div className="flex items-center gap-2">
+                <span>Preferred Time Slot</span>
+                {loadingSlots && <div className="h-3 w-3 animate-spin rounded-full border-2 border-gray-500 border-t-orange-500" />}
+              </div>
+              <select 
+                onChange={handleTimeSlotChange} 
+                className="input-field mt-2 bg-[#0b0b0b]"
+                required
+                disabled={loadingSlots || !form.event_date}
+              >
+                <option value="">{loadingSlots ? 'Checking availability...' : 'Select a time slot'}</option>
+                {TIME_SLOTS.map((slot) => (
+                  <option key={slot.label} value={slot.label} disabled={isSlotBooked(slot, occupiedSlots)}>
+                    {slot.label} {isSlotBooked(slot, occupiedSlots) ? '(Booked)' : ''}
+                  </option>
+                ))}
+              </select>
+              <span className="text-xs text-gray-500">The staff will verify availability for the selected slot.</span>
+              {allSlotsBooked && (
+                <p className="text-sm text-orange-500 mt-2 font-medium">⚠️ No slots available for this date. Please choose a different date.</p>
+              )}
+              {form.event_date && !loadingSlots && !allSlotsBooked && availableSlotsCount === 1 && (
+                <p className="text-xs text-orange-400 font-medium mt-1">⚠️ Only 1 slot remaining for this date!</p>
+              )}
             </label>
           </div>
 
