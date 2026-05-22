@@ -92,6 +92,7 @@ const DashboardProfile = () => {
 
         <button type="submit" className="btn-primary">Save</button>
         {status && <p className="text-sm text-emerald-300">{status}</p>}
+        {error && <p className="text-sm text-red-400">{error}</p>}
       </form>
     </div>
   );

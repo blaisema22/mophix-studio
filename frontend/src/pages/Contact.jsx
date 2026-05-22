@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { contactService } from '../services/api';
-import LoadingSpinner from '../components/LoadingSpinner';
 
 const Contact = () => {
   const [formData, setFormData] = useState({

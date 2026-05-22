@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { useAuthStore } from '../store';
 
 const MyProfile = () => {
   const { user } = useAuthStore();
-  const [profile, setProfile] = useState(user);
+  const profile = user;
 
   if (!user) {
     return (
