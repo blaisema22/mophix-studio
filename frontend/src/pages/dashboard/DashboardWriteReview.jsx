@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../store';
 import { bookingsService, testimonialsService } from '../../services/api';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import Panel from '../../components/Panel';
 
 const DashboardWriteReview = () => {
   const { user } = useAuthStore();
@@ -63,7 +64,7 @@ const DashboardWriteReview = () => {
       {loading ? (
         <LoadingSpinner />
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-6 rounded-[1.75rem] border border-orange-500/20 bg-[#141414] p-8 shadow-xl">
+        <Panel as="form" onSubmit={handleSubmit} className="space-y-6">
           {bookings.length === 0 ? (
             <div className="text-gray-400">You have no completed sessions available to review yet.</div>
           ) : (
@@ -105,7 +106,7 @@ const DashboardWriteReview = () => {
               {error && <p className="text-sm text-rose-300">{error}</p>}
             </>
           )}
-        </form>
+        </Panel>
       )}
     </div>
   );

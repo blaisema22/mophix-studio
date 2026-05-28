@@ -76,8 +76,9 @@ import StaffAccountChangePassword from './pages/staff/StaffAccountChangePassword
 
 
 // Admin Pages
-import AdminDashboardLayout from './pages/admin/AdminDashboardLayout';
+import AdminDashboardLayout from './pages/admin/Dashboard';
 import AdminDashboard from './pages/admin/Dashboard';
+
 import AdminGalleries from './pages/admin/Galleries';
 import AdminBookings from './pages/admin/Bookings';
 import AdminTestimonials from './pages/admin/Testimonials';
@@ -130,7 +131,7 @@ function AppContent() {
     }, []);
 
     return (
-        <div className="flex flex-col min-h-screen bg-black text-white">
+        <div className="flex flex-col min-h-screen bg-offWhite text-black">
             {!hideNavbar && <Navbar />}
             
             <main className="flex-1">

@@ -9,7 +9,7 @@ import {
   HiOutlineChevronUp,
   HiOutlineCamera,
   HiOutlineDocumentText,
-  HiOutlineEnvelope,
+  HiOutlineMail,
   HiOutlineKey,
   HiOutlineLogout,
   HiOutlineMenu,
@@ -103,7 +103,7 @@ const sidebarItems = [
     header: 'INBOX',
     items: [
       {
-        icon: <HiOutlineEnvelope className="h-5 w-5" />,
+        icon: <HiOutlineMail className="h-5 w-5" />,
         label: 'Messages',
         type: 'group',
         key: 'inbox',

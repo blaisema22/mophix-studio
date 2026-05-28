@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../store';
 import { usersService } from '../../services/api';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import Panel from '../../components/Panel';
 
 const DashboardProfile = () => {
   const { user, updateUser } = useAuthStore();
@@ -57,7 +58,7 @@ const DashboardProfile = () => {
         <p className="section-subtitle">Edit your personal details and contact information.</p>
       </div>
 
-      <form onSubmit={handleSave} className="space-y-6 rounded-[1.75rem] border border-orange-500/20 bg-[#141414] p-8 shadow-xl">
+      <Panel as="form" onSubmit={handleSave} className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           <label className="block text-sm text-gray-300">
             First Name
@@ -93,7 +94,7 @@ const DashboardProfile = () => {
         <button type="submit" className="btn-primary">Save</button>
         {status && <p className="text-sm text-emerald-300">{status}</p>}
         {error && <p className="text-sm text-red-400">{error}</p>}
-      </form>
+      </Panel>
     </div>
   );
 };

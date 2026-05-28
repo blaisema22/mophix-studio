@@ -6,7 +6,7 @@ require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 const DB_NAME     = process.env.DB_NAME    || 'mophix_studio';
 const DB_USER     = process.env.DB_USER    || 'root';
-const DB_PASSWORD = process.env.DB_PASSWORD ?? '';
+const DB_PASSWORD = process.env.DB_PASSWORD || '';
 const DB_HOST     = process.env.DB_HOST    || '127.0.0.1';
 const DB_DIALECT  = process.env.DB_DIALECT || 'mysql';
 

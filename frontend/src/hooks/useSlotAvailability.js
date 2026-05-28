@@ -1,40 +1,36 @@
 import { useState, useEffect } from 'react';
 import { bookingsService } from '../services/api';
-import { TIME_SLOTS, isSlotBooked } from '../utils/booking';
 
-export const useSlotAvailability = (eventDate) => {
-    const [occupiedSlots, setOccupiedSlots] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+export function useSlotAvailability(eventDate) {
+  const [occupiedSlots, setOccupiedSlots] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const fetchOccupiedSlots = async() => {
-            if (!eventDate) {
-                setOccupiedSlots([]);
-                return;
-            }
-            setLoading(true);
-            try {
-                const response = await bookingsService.getAll({ event_date: eventDate });
-                const bookings = response.data || response || [];
-                const occupied = bookings
-                    .filter(b => b.status !== 'cancelled')
-                    .map(b => ({
-                        start: b.preferred_time_start,
-                        end: b.preferred_time_end
-                    }));
-                setOccupiedSlots(occupied);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
+  useEffect(() => {
+    if (!eventDate) {
+      setOccupiedSlots([]);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    bookingsService
+      .getOccupiedSlots(eventDate)
+      .then((res) => {
+        if (!cancelled) setOccupiedSlots(res.data || res || []);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch slot availability', err);
+        if (!cancelled) setOccupiedSlots([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [eventDate]);
 
-        fetchOccupiedSlots();
-    }, [eventDate]);
+  const allSlotsBooked = occupiedSlots.length > 0 && occupiedSlots.every((s) => s.fullyBooked);
+  const availableSlotsCount = occupiedSlots.filter((s) => !s.fullyBooked).length;
 
-    const allSlotsBooked = eventDate && !loading && TIME_SLOTS.every(slot => isSlotBooked(slot, occupiedSlots));
-
-    return { occupiedSlots, allSlotsBooked, loading, error };
-};
+  return { occupiedSlots, allSlotsBooked, availableSlotsCount, loading };
+}

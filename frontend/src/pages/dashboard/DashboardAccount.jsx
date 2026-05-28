@@ -26,37 +26,37 @@ const DashboardAccount = () => {
         <h1 className="section-title">Account</h1>
         <p className="section-subtitle">Update your profile information and manage your account settings.</p>
       </div>
-      <form onSubmit={handleSave} className="space-y-6 rounded-[1.75rem] border border-orange-500/20 bg-[#141414] p-8 shadow-xl">
+      <form onSubmit={handleSave} className="space-y-6 rounded-[1.75rem] border border-orange-400/20 bg-black-dark p-8 shadow-xl">
         <div className="grid gap-6 md:grid-cols-2">
-          <label className="space-y-2 text-sm text-gray-400">
+          <label className="space-y-2 text-sm text-white/70">
             First Name
             <input
               type="text"
               name="first_name"
               value={profile.first_name || ''}
               onChange={handleChange}
-              className="input-field auth-input bg-[#0b0b0b]"
+              className="input-field auth-input"
             />
           </label>
-          <label className="space-y-2 text-sm text-gray-400">
+          <label className="space-y-2 text-sm text-white/70">
             Last Name
             <input
               type="text"
               name="last_name"
               value={profile.last_name || ''}
               onChange={handleChange}
-              className="input-field auth-input bg-[#0b0b0b]"
+              className="input-field auth-input"
             />
           </label>
         </div>
-        <label className="space-y-2 text-sm text-gray-400 block">
+        <label className="space-y-2 text-sm text-white/70 block">
           Email
           <input
             type="email"
             name="email"
             value={profile.email || ''}
             onChange={handleChange}
-            className="input-field auth-input bg-[#0b0b0b]"
+            className="input-field auth-input"
           />
         </label>
         <button type="submit" disabled={saving} className="btn-primary">

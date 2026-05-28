@@ -133,14 +133,14 @@ const GalleryDetail = () => {
           </div>
           <div className="flex flex-col gap-4">
             <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
-              <div className="text-xs uppercase tracking-widest text-gray-500 mb-1">Delivered</div>
+              <div className="text-xs uppercase tracking-widest text-white/50 mb-1">Delivered</div>
               <div className="text-lg font-medium text-white">
                 {gallery.published_date ? new Date(gallery.published_date).toLocaleDateString('en-RW', { month: 'long', year: 'numeric' }) : 'Recently'}
               </div>
             </div>
             <button 
               onClick={handleShare}
-              className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border border-orange-500/20 bg-orange-500/10 text-orange-300 hover:bg-orange-500/20 transition-all text-sm font-semibold"
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border border-orange-400/20 bg-orange-400/10 text-orange-300 hover:bg-orange-500/20 transition-all text-sm font-semibold"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
@@ -238,7 +238,7 @@ const GalleryDetail = () => {
             <div className="mt-8 text-center max-w-xl">
               <h3 className="text-xl font-semibold text-white">{photos[photoIndex].title || 'Untitled'}</h3>
               {photos[photoIndex].description && (
-                <p className="text-gray-400 mt-2 line-clamp-2">{photos[photoIndex].description}</p>
+                <p className="text-white/50 mt-2 line-clamp-2">{photos[photoIndex].description}</p>
               )}
               <div className="mt-6 flex items-center justify-center gap-4">
                 <a
@@ -246,7 +246,7 @@ const GalleryDetail = () => {
                   target="_blank"
                   rel="noreferrer"
                   download={photos[photoIndex].title || 'mophix-studio-photo'}
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-orange-500 text-black text-sm font-bold hover:bg-orange-400 transition-colors"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-orange-400 text-black text-sm font-bold hover:bg-orange-500 transition-colors"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Download High Res
