@@ -51,20 +51,30 @@ if (process.env.DB_SSL === 'true') {
 
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, sequelizeOptions);
 
-// Test connection on startup
+// Test connection on startup (do not hard-crash the whole app)
+let databaseConnected = false;
+
 (async () => {
     try {
         await sequelize.authenticate();
+        databaseConnected = true;
         console.log(`✔ Database connected — ${DB_DIALECT}://${DB_HOST}:${DB_PORT}/${DB_NAME}`);
     } catch (err) {
-        console.error('✘ Unable to connect to the database:');
+        databaseConnected = false;
+        console.error('✘ Unable to connect to the database (startup):');
         console.error(`  Host:    ${DB_HOST}:${DB_PORT}`);
         console.error(`  DB:      ${DB_NAME}`);
         console.error(`  User:    ${DB_USER}`);
         console.error(`  Reason:  ${err.message}`);
-        process.exit(1); // Crash early with a clear message instead of silent failure
+        // Allow the server to boot so non-DB endpoints (health, AI 503, etc.) can still work.
+        // Routes that require DB will return 503 until DB is available.
     }
 })();
 
+function isDatabaseConnected() {
+    return databaseConnected;
+}
+
 module.exports = sequelize;
 module.exports.Sequelize = Sequelize;
+module.exports.isDatabaseConnected = isDatabaseConnected;

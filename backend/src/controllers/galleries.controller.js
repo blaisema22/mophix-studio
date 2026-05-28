@@ -4,15 +4,27 @@ const { Gallery, Photo, Service, User } = require('../models');
 const { AppError } = require('../middleware/errorHandler');
 const fs = require('fs').promises;
 const path = require('path');
+const { isDatabaseConnected } = require('../config/database');
 
 // ==================== GALLERY CONTROLLERS ====================
+
 
 // Get all galleries
 const getAllGalleries = async (req, res, next) => {
     try {
+        if (!isDatabaseConnected()) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not connected',
+            });
+        }
+
+
+
         const { is_published = true, created_by, page = 1, limit = 12 } = req.query;
         
         const offset = (page - 1) * limit;
+
         const where = { is_published: is_published === 'true' };
 
         if (created_by) {

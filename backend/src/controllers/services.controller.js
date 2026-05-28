@@ -3,13 +3,23 @@
 const { Service, Gallery } = require('../models');
 const { AppError } = require('../middleware/errorHandler');
 const { Op } = require('sequelize');
+const { isDatabaseConnected } = require('../config/database');
 
 // Get all services
+
 const getAllServices = async (req, res, next) => {
     try {
+        if (!isDatabaseConnected()) {
+            return res.status(503).json({
+                success: false,
+                message: 'Database not connected',
+            });
+        }
+
         const { category, is_active, page = 1, limit = 20 } = req.query;
 
         const where = {};
+
         if (is_active !== undefined) where.is_active = is_active === 'true' || is_active === true;
         else where.is_active = true;
         if (category) where.category = category;
